@@ -12,3 +12,21 @@ DHT_main_simulation_file.py
 The code is commented, but retains a lot of "old artifacts" no longer in use. Throughout the summer of 2025 redundant lines and functions might be removed, and readability might be improved, but the functional code used to produce results will stay untouched.
 
 To produce the data on your own, simply follow the instructions in the method section of the paper and edit the parameters in the code accordingly.
+
+# Simulation timing
+
+## $N = 100$, ER-network $k=N/10$
+
+Creating 200 graphs took less than one second. It then uses ~10-15 seconds to initialize everything. Then it uses 25 seconds to run 200 simulations.
+
+In total: ~35-40 seconds.
+
+## $N = 1000$, ER-network $k=N/10$
+
+Creating 200 graphs took 34 seconds. Then it uses 200 seconds to run 200 simulations. Then it uses ~60 seconds to preocess and upload results.
+
+In total: ~294 seconds.
+
+## $N = 10000$, ER-network $k=N/10$
+
+My computer ran out of memory when converting the graphs into adjacency-matrices of size $(10000, 10000)$. We should consider using sparse arrays if compatible with numba.
