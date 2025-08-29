@@ -7,7 +7,16 @@ This repository contains all code used for the project thesis delivered on 21.06
 The plots used in the project thesis paper are in the plots folder. 
 The code used to produce the results shown in the plots lies in:
 
-DHT_main_simulation_file.py
+~~DHT_main_simulation_file.py~~ 
+main.py
+
+Which uses code existing in the following python-files to get results, and saves them to a .npz-file.
+
+agents.py - to initialize agents and beliefs.
+metrics.py - calculates all metrics used for results, also holds normalization functions.
+networks.py - generates all networks used to get results.
+plots.py - generates plots from results.
+simulation.py - contains code to update beliefs and run one entire simulation.
 
 The code is commented, but retains a lot of "old artifacts" no longer in use. Throughout the summer of 2025 redundant lines and functions might be removed, and readability might be improved, but the functional code used to produce results will stay untouched.
 
