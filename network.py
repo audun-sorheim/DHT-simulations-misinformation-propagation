@@ -1,12 +1,5 @@
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
-import tqdm
-import time
-import numba
-import scipy as sp
-import inspect
-from collections import Counter
 
 def create_watts_strogatz_network(N, k, p_ws, seed, mega_node_bool=False, dir=True):
     """Function that creates Watts-Strogatz network
