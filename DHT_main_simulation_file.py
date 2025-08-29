@@ -311,7 +311,7 @@ def create_graphs(num_simulations, N, seed, graph_func, **kwargs):
 
     adj_matrices = []
 
-    for i in range(num_simulations):
+    for i in tqdm.tqdm(range(num_simulations), desc="creating graphs"):
         G = graph_func(N, seed=seed + (i+1), **kwargs)
         raw_matrix = np.array(nx.to_numpy_array(G), dtype=np.float64)
         stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
@@ -1091,7 +1091,7 @@ if __name__=="__main__":
         num_iterations = 150
         num_simulations = 200
         cap = 1
-        k = 10
+        k = N//10
         # ks = np.arange(1, 5)
         m = 5
         ms = np.arange(1,21)
@@ -1122,7 +1122,8 @@ if __name__=="__main__":
         sociopaths = random_agents[:num_sociopaths] if sociopath_bool else np.array([], dtype=np.int64)
         conspirators = random_agents[num_sociopaths:(num_sociopaths + num_conspirators)] if conspirator_bool else np.array([], dtype=np.int64)
 
-        adj_matrices = create_graphs(num_simulations, N, seed, graph_func=create_fully_connected_network)
+        adj_matrices = create_graphs(num_simulations, N, seed, graph_func=create_erdos_renyi_network, 
+                                     p_er=k/(N-1), true_mega_node_bool=true_mega_node_bool, consp_mega_node_bool=consp_mega_node_bool)        
         print(f"Running {num_simulations} simulations on a BA graph with p=1 \nwith true mega-node={true_mega_node_bool} with beliefs {true_mega_node_beliefs} \nand conspiring mega-node={consp_mega_node_bool} with beliefs {consp_mega_node_beliefs}\n")
         # Call parallelized function
         private_belief_histories, public_belief_histories, _, _, _ = run_simulations(
