@@ -22,9 +22,25 @@ from networks import (create_graphs,
 )
 from agents import assign_hypothesis_groups
 
-def run_simulations(adj_matrices, num_simulations, N, M, true_hypothesis, num_iterations, 
-                    cap, sociopaths, conspirators, sociopath_bool, conspirator_bool, 
-                    true_mega_node_bool, true_mega_node_beliefs, consp_mega_node_bool, consp_mega_node_beliefs, num_groups, D, seed):
+def run_simulations(
+    adj_matrices, 
+    num_simulations, 
+    N, 
+    M, 
+    true_hypothesis, 
+    num_iterations, 
+    confbias_bool=True,
+    log_beliefs_bool=False,
+    cap=1,
+    conspirators=None, 
+    conspirator_bool=False, 
+    true_mega_node_bool=False, 
+    true_mega_node_beliefs=None, 
+    consp_mega_node_bool=False, 
+    consp_mega_node_beliefs=None,
+    seed=None,
+    **kwargs
+):
     """Runs all simulations for the DHT model. Do NOT run this function in parallel,
     as it will cause perturbations from results run in series.
 
@@ -64,15 +80,23 @@ def run_simulations(adj_matrices, num_simulations, N, M, true_hypothesis, num_it
         # Create network graph
         adj_matrix = adj_matrices[i]
 
-        A = assign_hypothesis_groups(N, M, num_groups)
-        mu_mat = np.random.randn(N, num_groups, D)  # or D if D ≠ M
-
         # Simulate belief updates
         private_belief_history, public_belief_history, _, _, _ = simulator(
-            adj_matrix, N, M, true_hypothesis, num_iterations, cap, 
-            sociopaths, conspirators, sociopath_bool, conspirator_bool, 
-            true_mega_node_bool, true_mega_node_beliefs, consp_mega_node_bool, consp_mega_node_beliefs,
-            A, mu_mat, counter1
+        adj_matrix, 
+        N, 
+        M, 
+        true_hypothesis, 
+        num_iterations, 
+        confbias_bool=confbias_bool,
+        log_beliefs_bool=log_beliefs_bool,
+        cap=1, 
+        conspirators=None, 
+        conspirator_bool=False, 
+        true_mega_node_bool=False, 
+        true_mega_node_beliefs=None, 
+        consp_mega_node_bool=False, 
+        consp_mega_node_beliefs=None,
+        counter1=0
         )
         
 
@@ -104,13 +128,15 @@ def main():
     parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
     parser.add_argument("--m", type=int, default=5, help="Number of edges per new node (BA graph only, default: 5)")
     parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA"], help="Graph type: ER or BA (default: ER)")
+    parser.add_argument("--cap", type=float, default=1.0, help="Maximum signal strength (default: 1.0)")
 
     # === Additional new parameters ===
     parser.add_argument("--sigmoid_factor", type=float, default=4.0, help="Sigmoid factor (default: 4)")
     parser.add_argument("--std_draw", type=float, default=0.5, help="Std dev for draw (default: 0.5)")
     parser.add_argument("--std_likelihood", type=float, default=0.5, help="Std dev for likelihood (default: 0.5)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
-    parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
+    parser.add_argument("--log_belief_bool", default=False, action="store_true", help="Enable log-belief mode (default: False)")
+    parser.add_argument("--confbias_bool", default=True, action="store_true", help="Enable confirmation bias (default: False)")
 
     args = parser.parse_args()
 
@@ -122,11 +148,6 @@ def main():
     # === Misc. setup ===
     M = 4
     true_hypothesis = M - 1
-    num_sociopaths = int(np.round(0.018 * N, 0))
-    sociopath_bool = False
-    num_groups = M // 2
-    D = 5
-    cap = 1
     seed = int(time.time())
 
     # === Mega-node beliefs ===
@@ -137,8 +158,7 @@ def main():
 
     # === Sociopaths / Conspirators ===
     random_agents = np.random.permutation(N)[:N].astype(np.int64)
-    sociopaths = random_agents[:num_sociopaths] if sociopath_bool else np.array([], dtype=np.int64)
-    conspirators = random_agents[num_sociopaths:(num_sociopaths + num_conspirators)] if args.conspirator_bool else np.array([], dtype=np.int64)
+    conspirators = random_agents[:num_conspirators] if args.conspirator_bool else np.array([], dtype=np.int64)
 
     # === Graph generation ===
     if args.graph == "ER":
@@ -164,10 +184,22 @@ def main():
 
     # === Run simulation ===
     private_belief_histories, public_belief_histories, _, _, _ = run_simulations(
-        adj_matrices, args.num_simulations, N, M, true_hypothesis, args.num_iterations, cap,
-        sociopaths, conspirators, sociopath_bool, args.conspirator_bool,
-        args.true_mega_node_bool, true_mega_node_beliefs,
-        args.consp_mega_node_bool, consp_mega_node_beliefs, num_groups, D, seed
+        adj_matrices=adj_matrices,
+        num_simulations=args.num_simulations,
+        N=N,
+        M=M,
+        true_hypothesis=true_hypothesis,
+        num_iterations=args.num_iterations,
+        confbias_bool=args.confbias_bool,
+        log_beliefs_bool=args.log_belief_bool,
+        cap=args.cap,
+        conspirators=conspirators,
+        conspirator_bool=args.conspirator_bool,
+        true_mega_node_bool=args.true_mega_node_bool,
+        true_mega_node_beliefs=true_mega_node_beliefs,
+        consp_mega_node_bool=args.consp_mega_node_bool,
+        consp_mega_node_beliefs=consp_mega_node_beliefs,
+        seed=seed
     )
 
     # === Save output ===
