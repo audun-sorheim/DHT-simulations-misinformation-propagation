@@ -8,10 +8,10 @@ import scipy as sp
 import inspect
 from collections import Counter
 from metrics import normalize_each_row_sum, calculate_metrics
-from agents import initialize_beliefs, get_likelihoods
+from agents import initialize_beliefs, get_likelihoods, get_flexibilities, get_likelihoods_gaussian
 
 @numba.jit(nopython=True)
-def update_beliefs(N, M, private_beliefs, adj_matrix, likelihood, true_hypothesis, cap, 
+def update_beliefs(N, M, private_beliefs, p_prev, q_prev, adj_matrix, likelihood, flexibilities, true_hypothesis, cap, 
                    sociopaths, conspirators, sociopath_bool, conspirator_bool, 
                    true_mega_node_bool, true_mega_node_beliefs, consp_mega_node_bool, consp_mega_node_beliefs,
                    counter1, counter2
@@ -46,9 +46,11 @@ def update_beliefs(N, M, private_beliefs, adj_matrix, likelihood, true_hypothesi
     # private_beliefs[:, true_hypothesis] += cap*likelihood[:, true_hypothesis]
     # private_beliefs = normalize_each_row_sum(private_beliefs, N, M)
 
-    public_beliefs = likelihood**LRTU_exp*private_beliefs
+    public_beliefs = likelihood**LRTU_exp*private_beliefs*flexibilities.reshape(-1, 1) + p_prev*(1 - flexibilities.reshape(-1, 1))
     public_beliefs = normalize_each_row_sum(public_beliefs, N, M)
-
+    if np.sum(np.abs(public_beliefs[0])) > 1 + 1e-6:
+        print(f"\n\npublic_beliefs[0]: {public_beliefs[0]}\n\n")
+        raise ValueError("Sum of Public beliefs exceed 1")
     if true_mega_node_bool:
         public_beliefs[0] = true_mega_node_beliefs
     if consp_mega_node_bool:
@@ -96,18 +98,24 @@ def update_beliefs(N, M, private_beliefs, adj_matrix, likelihood, true_hypothesi
         neighbor_beliefs = public_beliefs[neighbor_indices]
         neighbor_beliefs = np.clip(neighbor_beliefs, epsilon, None)
         num_neighbors = neighbor_beliefs.shape[0]
+
+        # Uniform weights
         weights = adj_matrix[neighbor_indices, i]
+
+        # Confirmation bias weights
+        # sigmoid_factor = 4
+        # diff = np.abs(private_beliefs[i] - neighbor_beliefs)
+        # norms = np.sqrt(np.sum(diff*diff, axis=1))
+        # x = 1.0 - norms
+        # weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+
+        # Random weights
         # weights = np.random.rand(num_neighbors).astype(np.float64)
 
         # weights = np.zeros(num_neighbors, dtype=np.float64)
         # for k in range(num_neighbors):
         #     weights[k] = np.dot(neighbor_beliefs[k], private_beliefs[i])
 
-        # sigmoid_factor = 4
-        # x = np.zeros(num_neighbors, dtype=np.float64)
-        # for k in range(num_neighbors):
-        #     x[k] = 1 - np.linalg.norm(np.abs(private_beliefs[i] - neighbor_beliefs[k]))
-        # weights = 1/(1 + np.exp(sigmoid_factor*(x - 0.5)))
 
         # weights = np.dot(neighbor_beliefs, private_beliefs[i])
 
@@ -115,18 +123,21 @@ def update_beliefs(N, M, private_beliefs, adj_matrix, likelihood, true_hypothesi
         #     weights[0] = np.dot(private_beliefs[i], true_mega_node_beliefs)
         # if consp_mega_node_bool:
         #     weights[0] = np.dot(private_beliefs[i], consp_mega_node_beliefs)
-        weights = weights / np.sum(weights)
+
+        weights = weights / np.sum(weights) # Normalize weights
 
         if weights.shape[0] != neighbor_beliefs.shape[0]:
-            print(f"BAD SHAPE DETECTED: weights.shape = {weights.shape[0]}, np.log(neighbor_beliefs).shape = {np.log(neighbor_beliefs).shape[0]}")
+            print(f"BAD SHAPE DETECTED: weights.shape = {weights.shape[0]}, neighbor_beliefs.shape = {neighbor_beliefs.shape[0]}")
             print(f"Failure at simulation {counter1}, iteration {counter2}, agent {i}.")
             raise ValueError("Expected 1D arrays for dot product")
 
         if sociopath_bool and i in sociopaths or conspirator_bool and i in conspirators:
             continue
         else:
+            # update_sum = np.dot(weights, neighbor_beliefs)*flexibilities[i] + q_prev[i, :]*(1 - flexibilities[i])
+            # private_beliefs[i] = update_sum/np.sum(update_sum, axis=0)
             log_sum = np.dot(weights, np.log(neighbor_beliefs))
-            exp_log_sum = np.exp(log_sum)
+            exp_log_sum = np.exp(log_sum) + q_prev[i, :]*(1 - flexibilities[i])
             private_beliefs[i] = exp_log_sum/np.sum(exp_log_sum, axis=0)
 
     # C_agent = public_beliefs - private_beliefs
@@ -206,7 +217,9 @@ def simulator(adj_matrix, N, M, true_hypothesis, num_iterations, cap,
 
         # signals, means, stds = prepare_signals(M, M, true_hypothesis)
         # likelihoods = generate_likelihoods(N, M, signals, means, stds)
-        likelihoods = get_likelihoods(N, M, true_hypothesis)
+        # likelihoods = get_likelihoods(N, M, true_hypothesis)
+        likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis)
+        flexibilities = get_flexibilities(N)
         # agent_probs = generate_agent_probs_with_overlaps(N, M, overlap_rate=0.5, seed=seed)
         # likelihoods = get_agent_specific_likelihoods(N, M, true_hypothesis, agent_probs)
         group_id = A[i, -1]  # or any index j
@@ -219,8 +232,15 @@ def simulator(adj_matrix, N, M, true_hypothesis, num_iterations, cap,
         if consp_mega_node_bool:
             private_beliefs[-1] = consp_mega_node_beliefs
 
+        if i == 0:
+            p_prev = np.zeros((N,M))
+            q_prev = np.zeros((N,M))
+        else:
+            p_prev = public_belief_history[i-1]
+            q_prev = private_belief_history[i-1]
+
         private_beliefs, public_beliefs = update_beliefs(
-            N, M, private_beliefs, adj_matrix, likelihoods, true_hypothesis, cap, 
+            N, M, private_beliefs, p_prev, q_prev, adj_matrix, likelihoods, flexibilities, true_hypothesis, cap, 
             sociopaths, conspirators, sociopath_bool, conspirator_bool, 
             true_mega_node_bool, true_mega_node_beliefs, consp_mega_node_bool, consp_mega_node_beliefs,
             counter1, counter2

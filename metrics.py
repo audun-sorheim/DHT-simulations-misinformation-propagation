@@ -83,14 +83,15 @@ def truthfulness(q, true_hypothesis):
     T = np.mean(q_truth, axis=(0,2))
     return T
 
-def cognitive_dissonance(q, p, true_hypothesis):
+def cognitive_dissonance(q, p):
     C_agent = np.abs(q - p)
     C = np.mean(C_agent, axis=(0,2,3))
     return C
 
 @numba.jit(nopython=True)
 def normalize_each_row_sum(arr, N, M):
-    """A function to normalize arrays of shape(N,M) such that the sums of any row is equal to 1.
+    """
+    Vectorized normalization of a 2D array such that each row sums to 1.
 
     Args:
         arr (ndarray shape(N,M)): The array to be normalized
@@ -100,12 +101,12 @@ def normalize_each_row_sum(arr, N, M):
     Returns:
         normalized_arr (ndarray shape(N,M)): The normalized array
     """
-    normalized_arr = np.zeros((N, M), dtype=np.float64)  # Create new array
-
-    for n in range(N):
-        row_sum = np.sum(arr[n, :]) + 1e-12 # Compute the sum of the row
-        normalized_arr[n] = arr[n] / row_sum  # Normalize by row sum
-
+    # Compute row sums (axis=1)
+    row_sums = arr.sum(axis=1) + 1e-12  # shape (N,)
+    
+    # Broadcast division across columns
+    normalized_arr = arr / row_sums[:, None]
+    
     return normalized_arr
 
 @numba.jit(nopython=True)
@@ -133,6 +134,7 @@ def generate_means(N, num_groups, D):
     mu_mat = np.random.randn(N, num_groups, D)
     return mu_mat
 
+@numba.jit(nopython=True)
 def gaussian_pdf(x, mean, std):
     """Generates a gaussian pdf to finde the likelihood of the signal belonging to a hypothesis.
 

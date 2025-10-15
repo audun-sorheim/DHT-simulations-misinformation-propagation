@@ -276,7 +276,7 @@ def create_graphs(num_simulations, N, seed, graph_func, **kwargs):
 
     adj_matrices = []
 
-    for i in range(num_simulations):
+    for i in tqdm.tqdm(range(num_simulations), desc="creating graphs"):
         G = graph_func(N, seed=seed + (i+1), **kwargs)
         raw_matrix = np.array(nx.to_numpy_array(G), dtype=np.float64)
         stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
