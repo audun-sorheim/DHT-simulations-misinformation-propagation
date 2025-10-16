@@ -128,10 +128,10 @@ def update_beliefs(
             norms = np.sqrt(np.sum(diff*diff, axis=1))
             x = 1.0 - norms
             weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+        
+        weights = weights / num_neighbors # Normalize weights by number of neighbors
 
         # Confirmation bias weights
-
-        weights = weights / np.sum(weights) # Normalize weights
 
         if weights.shape[0] != neighbor_beliefs.shape[0]:
             print(f"BAD SHAPE DETECTED: weights.shape = {weights.shape[0]}, neighbor_beliefs.shape = {neighbor_beliefs.shape[0]}")
@@ -163,6 +163,10 @@ def simulator(
     confbias_bool=True,
     log_beliefs_bool=False,
     cap=1, 
+    std_draw=0.5,
+    std_likelihood=0.5,
+    flex_strength=0.8,
+    flex_interval=None,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -213,8 +217,8 @@ def simulator(
     for i in range(1, num_iterations+1):
 
         # likelihoods = get_likelihoods(N, M, true_hypothesis)
-        likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis)
-        flexibilities = get_flexibilities(N)
+        likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=std_draw, std_likelihood=std_likelihood)
+        flexibilities = get_flexibilities(N, flex_strength=flex_strength, flex_interval=flex_interval)
 
         if true_mega_node_bool:
             private_beliefs[0] = true_mega_node_beliefs
@@ -229,13 +233,26 @@ def simulator(
             q_prev = private_belief_history[i-1]
 
         private_beliefs, public_beliefs = update_beliefs(
-            N=N, M=M, private_beliefs=private_beliefs, p_prev=p_prev, q_prev=q_prev,
-            adj_matrix=adj_matrix, likelihood=likelihoods, flexibilities=flexibilities,
-            true_hypothesis=true_hypothesis, confbias_bool=confbias_bool, log_beliefs_bool=log_beliefs_bool, cap=cap,
-            conspirators=conspirators, conspirator_bool=conspirator_bool, 
-            true_mega_node_bool=true_mega_node_bool, true_mega_node_beliefs=true_mega_node_beliefs, 
-            consp_mega_node_bool=consp_mega_node_bool, consp_mega_node_beliefs=consp_mega_node_beliefs, 
-            counter1=counter1, counter2=counter2
+            N=N, 
+            M=M, 
+            private_beliefs=private_beliefs, 
+            p_prev=p_prev, 
+            q_prev=q_prev,
+            adj_matrix=adj_matrix,
+            likelihood=likelihoods, 
+            flexibilities=flexibilities,
+            true_hypothesis=true_hypothesis, 
+            confbias_bool=confbias_bool, 
+            log_beliefs_bool=log_beliefs_bool, 
+            cap=cap,
+            conspirators=conspirators, 
+            conspirator_bool=conspirator_bool, 
+            true_mega_node_bool=true_mega_node_bool, 
+            true_mega_node_beliefs=true_mega_node_beliefs, 
+            consp_mega_node_bool=consp_mega_node_bool, 
+            consp_mega_node_beliefs=consp_mega_node_beliefs, 
+            counter1=counter1, 
+            counter2=counter2
         )
 
         # print(f"Iteration {i}: private_beliefs shape: {private_beliefs.shape}")

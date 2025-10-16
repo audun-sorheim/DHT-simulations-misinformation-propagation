@@ -45,25 +45,25 @@ def get_likelihoods(N, M, true_hypothesis):
     return likelihoods
 
 @numba.jit(nopython=True)
-def get_flexibilities(N):
+def get_flexibilities(N, flex_strength=0.8, flex_interval=None):
     """Generates the flexibilities for the agents in the network.
 
     Args:
         N (int): Number of agents in the network
-        M (int): Number of hypotheses in the network
-        signals (nd-array(floats) shape=(N)): The signals for all agents
-        means (nd-array(floats) shape=(N,M)): The means for all agents
-        stds (nd-array(floats) shape=(N,M)): The standard deviations for all agents
+        flex_strength (float): The strength of the flexibilities
+        flex_interval (list): The interval for the flexibilities
 
     Returns:
         likelihoods (nd-array(floats) shape=(N,M)): The likelhood functions for all agents and hypotheses
     """
-    # flexibilities = np.random.uniform(low=0.3, high=0.7, size=N).astype(np.float64)
-    flexibilities = np.ones(N, dtype=np.float64)#*0.8
+    if flex_interval is not None:
+        flexibilities = np.random.uniform(low=flex_interval[0], high=flex_interval[1], size=N).astype(np.float64)
+    else:
+        flexibilities = np.ones(N, dtype=np.float64) * flex_strength
     return flexibilities
 
 @numba.jit(nopython=True)
-def get_likelihoods_gaussian(N, M, true_hypothesis):
+def get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=0.5, std_likelihood=0.5):
     """
     DHT-style Gaussian likelihoods:
       - Each hypothesis k has a distinct mean (same for all agents)
@@ -75,6 +75,8 @@ def get_likelihoods_gaussian(N, M, true_hypothesis):
         N (int): number of agents
         M (int): number of hypotheses
         true_hypothesis (int): index of the true hypothesis
+        std_draw (float): standard deviation for drawing signals
+        std_likelihood (float): standard deviation for likelihood computation
 
     Returns:
         likelihoods (N, M): per-agent likelihoods
