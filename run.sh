@@ -20,7 +20,7 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --sigmoid_factor ${SIGMOID_FACTOR:-4.0} \
         --std_draw ${STD_DRAW:-0.5} \
         --std_likelihood ${STD_LIKELIHOOD:-0.5} \
-        --flex_strength ${FLEX_STRENGTH:-0.5} \
+        --flex_strength ${FLEX_STRENGTH:-0.8} \
         $( [[ "${LOG_BELIEF_BOOL:-False}" == "True" ]] && echo "--log_belief_bool" ) \
         $( [[ "${CONFBIAS_BOOL:-True}" == "True" ]] && echo "--confbias_bool" )
     LEFT=$((NUM_LOOPS - i))
