@@ -8,9 +8,9 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
     python3 main.py \
         --N ${N:-100} \
         --num_conspirators_frac ${NUM_CONSPIRATORS_FRAC:-0.05} \
-        --conspirator_bool ${CONSPIRATOR_BOOL:-False} \
-        --true_mega_node_bool ${TRUE_MEGA_NODE_BOOL:-False} \
-        --consp_mega_node_bool ${CONSP_MEGA_NODE_BOOL:-False} \
+        $( [[ "${CONSPIRATOR_BOOL:-False}" == "True" ]] && echo "--conspirator_bool" ) \
+        $( [[ "${TRUE_MEGA_NODE_BOOL:-False}" == "True" ]] && echo "--true_mega_node_bool" ) \
+        $( [[ "${CONSP_MEGA_NODE_BOOL:-False}" == "True" ]] && echo "--consp_mega_node_bool" ) \
         --num_iterations ${NUM_ITERATIONS:-150} \
         --num_simulations ${NUM_SIMULATIONS:-200} \
         --k ${K:-$(echo "0.1 * ${N:-100}" | bc)} \
@@ -21,8 +21,8 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --std_draw ${STD_DRAW:-0.5} \
         --std_likelihood ${STD_LIKELIHOOD:-0.5} \
         --flex_strength ${FLEX_STRENGTH:-0.5} \
-        --log_belief_bool ${LOG_BELIEF_BOOL:-False} \
-        --confbias_bool ${CONFBIAS_BOOL:-True}
+        $( [[ "${LOG_BELIEF_BOOL:-False}" == "True" ]] && echo "--log_belief_bool" ) \
+        $( [[ "${CONFBIAS_BOOL:-True}" == "True" ]] && echo "--confbias_bool" )
     LEFT=$((NUM_LOOPS - i))
     echo "Loop number $i is done, $LEFT"
 done
