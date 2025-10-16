@@ -129,9 +129,9 @@ def main():
     parser.add_argument("--N", type=int, default=100, help="Number of agents (default: 100)")
     parser.add_argument("--M", type=int, default=4, help="Number of hypotheses (default: 4)")
     parser.add_argument("--num_conspirators_frac", type=float, default=0.05, help="Fraction of conspirators (default: 0.05)")
-    parser.add_argument("--conspirator_bool", default=False, action="store_true", help="Enable conspirators (default: False)")
-    parser.add_argument("--true_mega_node_bool", default=False, action="store_true", help="Enable true mega-node (default: False)")
-    parser.add_argument("--consp_mega_node_bool", default=False, action="store_true", help="Enable conspiring mega-node (default: False)")
+    parser.add_argument("--conspirator_bool", action="store_true", help="Enable conspirators (default: False)")
+    parser.add_argument("--true_mega_node_bool", action="store_true", help="Enable true mega-node (default: False)")
+    parser.add_argument("--consp_mega_node_bool", action="store_true", help="Enable conspiring mega-node (default: False)")
     parser.add_argument("--num_iterations", type=int, default=150, help="Number of iterations (default: 150)")
     parser.add_argument("--num_simulations", type=int, default=200, help="Number of simulations (default: 200)")
     parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
@@ -145,8 +145,8 @@ def main():
     parser.add_argument("--std_likelihood", type=float, default=0.5, help="Std dev for likelihood (default: 0.5)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
     parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
-    parser.add_argument("--log_belief_bool", default=False, action="store_true", help="Enable log-belief mode (default: False)")
-    parser.add_argument("--confbias_bool", default=True, action="store_true", help="Enable confirmation bias (default: False)")
+    parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
+    parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
 
     args = parser.parse_args()
 
