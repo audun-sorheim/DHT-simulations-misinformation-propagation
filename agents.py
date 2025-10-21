@@ -81,8 +81,6 @@ def get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=0.5, std_likelihood
     Returns:
         likelihoods (N, M): per-agent likelihoods
     """
-    std_draw = 0.5
-    std_likelihood = 0.5
     means = np.linspace(-1.0, 1.0, M)
     likelihoods = np.zeros((N, M))
     # print(means, means[true_hypothesis])
