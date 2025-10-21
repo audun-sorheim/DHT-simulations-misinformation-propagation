@@ -78,7 +78,7 @@ def run_simulations(
     T_public_histories = np.zeros_like(T_private_histories)
     C_histories = np.zeros_like(T_private_histories)
     counter1 = 0
-
+    print(f"std_draw: {std_draw}, std_likelihood: {std_likelihood}")
     for i in tqdm.tqdm(range(num_simulations), desc="Running simulations", position=0, leave=True):
 
         # Create network graph
@@ -141,14 +141,15 @@ def main():
 
     # === Additional new parameters ===
     parser.add_argument("--sigmoid_factor", type=float, default=4.0, help="Sigmoid factor (default: 4)")
-    parser.add_argument("--std_draw", type=float, default=0.5, help="Std dev for draw (default: 0.5)")
-    parser.add_argument("--std_likelihood", type=float, default=0.5, help="Std dev for likelihood (default: 0.5)")
+    parser.add_argument("--std_draw", type=float, default=1.0, help="Std dev for draw (default: 1.0)")
+    parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
     parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
     parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
 
     args = parser.parse_args()
+    print(f"std_draw: {args.std_draw}, std_likelihood: {args.std_likelihood}")
 
     # === Initialize derived parameters ===
     N = args.N
@@ -179,14 +180,14 @@ def main():
             true_mega_node_bool=args.true_mega_node_bool,
             consp_mega_node_bool=args.consp_mega_node_bool
         )
-        graph_desc = f"ER_p{k/(N-1):.3f}"
+        graph_desc = f"ER"
     elif args.graph == "BA":
         adj_matrices = create_graphs(
             args.num_simulations, N, seed,
             graph_func=create_barabasi_albert_network,
             m=args.m
         )
-        graph_desc = f"BA_m{args.m}"
+        graph_desc = f"BA"
 
     print(f"\nRunning {args.num_simulations} simulations on a {args.graph} graph "
           f"with N={N}, k={k}, conspirators={args.conspirator_bool}, "
@@ -218,24 +219,24 @@ def main():
 
     # === Save output ===
     filename_base = (
-        f"DHT_k{k}_{graph_desc}"
-        f"{'_logbeliefs' if args.log_belief_bool else ''}"
-        f"_gaussian_{int(args.flex_strength*10)}flex_uniformweights"
+        f"DHT_N{N}_k{k}_{graph_desc}"
+        f"{'_logbeliefs' if args.log_belief_bool else '_linbeliefs'}"
+        f"_gaussian-stds{args.std_draw}_{int(args.flex_strength*10)}flex_confbias-{args.confbias_bool}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )
 
     # Ensure unique filename
     i = 1
     filename = f"{filename_base}_{i}.npz"
-    while os.path.exists(filename):
+    while os.path.exists("testing/"+filename):
         i += 1
         filename = f"{filename_base}_{i}.npz"
 
-    np.savez_compressed(filename,
+    np.savez_compressed("testing/"+filename,
                         private=private_belief_histories,
                         public=public_belief_histories)
 
-    print(f"\n✅ Results saved to: {filename}\n")
+    print(f"\nGreat Success!  Results saved to: testing/{filename}\n")
 
 
 if __name__ == "__main__":
