@@ -31,6 +31,7 @@ def run_simulations(
     num_iterations, 
     confbias_bool=True,
     log_beliefs_bool=False,
+    gaussian_bool=True,
     cap=1,
     std_draw=0.5,
     std_likelihood=0.5,
@@ -93,6 +94,7 @@ def run_simulations(
         num_iterations, 
         confbias_bool=confbias_bool,
         log_beliefs_bool=log_beliefs_bool,
+        gaussian_bool=gaussian_bool,
         cap=cap, 
         std_draw=std_draw,
         std_likelihood=std_likelihood,
@@ -147,6 +149,7 @@ def main():
     parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
     parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
+    parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
 
     args = parser.parse_args()
     print(f"std_draw: {args.std_draw}, std_likelihood: {args.std_likelihood}")
@@ -203,6 +206,7 @@ def main():
         num_iterations=args.num_iterations,
         confbias_bool=args.confbias_bool,
         log_beliefs_bool=args.log_belief_bool,
+        gaussian_bool=args.gaussian_bool,
         cap=args.cap,
         std_draw=args.std_draw,
         std_likelihood=args.std_likelihood,
