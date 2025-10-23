@@ -12,14 +12,14 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         $( [[ "${CONSPIRATOR_BOOL:-False}" == "True" ]] && echo "--conspirator_bool" ) \
         $( [[ "${TRUE_MEGA_NODE_BOOL:-False}" == "True" ]] && echo "--true_mega_node_bool" ) \
         $( [[ "${CONSP_MEGA_NODE_BOOL:-False}" == "True" ]] && echo "--consp_mega_node_bool" ) \
-        --num_iterations ${NUM_ITERATIONS:-150} \
+        --num_iterations ${NUM_ITERATIONS:-300} \
         --num_simulations ${NUM_SIMULATIONS:-200} \
         --k ${K} \
         --m ${M:-5} \
         --graph ${GRAPH:-"ER"} \
         --cap ${CAP:-1.0} \
         --sigmoid_factor ${SIGMOID_FACTOR:-4.0} \
-        --std_draw ${STD_DRAW:-1.0} \
+        --std_draw ${STD_DRAW:-0.5} \
         --std_likelihood ${STD_LIKELIHOOD:-0.5} \
         --flex_strength ${FLEX_STRENGTH:-0.8} \
         $( [[ "${LOG_BELIEF_BOOL:-False}" == "True" ]] && echo "--log_belief_bool" ) \
