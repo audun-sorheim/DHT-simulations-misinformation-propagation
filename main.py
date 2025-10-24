@@ -140,7 +140,7 @@ def main():
     parser.add_argument("--num_simulations", type=int, default=200, help="Number of simulations (default: 200)")
     parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
     parser.add_argument("--m", type=int, default=5, help="Number of edges per new node (BA graph only, default: 5)")
-    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA"], help="Graph type: ER or BA (default: ER)")
+    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA", "PRICE"], help="Graph type: ER, BA or Price (default: ER)")
     parser.add_argument("--cap", type=float, default=1.0, help="Maximum signal strength (default: 1.0)")
 
     # === Additional new parameters ===
@@ -196,6 +196,15 @@ def main():
             m=args.m
         )
         graph_desc = f"BA"
+    elif args.graph == "PRICE":
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_price_network,
+            m=args.m
+        )
+        graph_desc = f"PRICE"
+    else:
+        raise ValueError(f"{args.graph} is an invalid graph type, must be 'ER', 'BA' or 'PRICE'.")
     
     print(f"# simulations: {args.num_simulations}   # iterations: {args.num_iterations}")
     print(f"graph-type: {graph_desc}    N: {N}  k: {k}  m: {args.m}")
