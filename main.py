@@ -37,6 +37,7 @@ def run_simulations(
     std_likelihood=0.5,
     flex_strength=0.8,
     flex_interval=None,
+    sigmoid_factor=4,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -79,7 +80,7 @@ def run_simulations(
     T_public_histories = np.zeros_like(T_private_histories)
     C_histories = np.zeros_like(T_private_histories)
     counter1 = 0
-    print(f"std_draw: {std_draw}, std_likelihood: {std_likelihood}")
+
     for i in tqdm.tqdm(range(num_simulations), desc="Running simulations", position=0, leave=True):
 
         # Create network graph
@@ -100,6 +101,7 @@ def run_simulations(
         std_likelihood=std_likelihood,
         flex_strength=flex_strength,
         flex_interval=flex_interval,
+        sigmoid_factor=sigmoid_factor,
         conspirators=conspirators, 
         conspirator_bool=conspirator_bool, 
         true_mega_node_bool=true_mega_node_bool, 
@@ -147,12 +149,15 @@ def main():
     parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
     parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
-    parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
+    parser.add_argument("--log_beliefs_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
     parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
 
     args = parser.parse_args()
-    print(f"std_draw: {args.std_draw}, std_likelihood: {args.std_likelihood}")
+
+    # === Set default boolean values ===
+    parser.set_defaults(log_beliefs_bool=False, confbias_bool=True, gaussian_bool=True,
+                        conspirator_bool=False, true_mega_node_bool=False, consp_mega_node_bool=False)
 
     # === Initialize derived parameters ===
     N = args.N
@@ -191,7 +196,12 @@ def main():
             m=args.m
         )
         graph_desc = f"BA"
-
+    
+    print(f"# simulations: {args.num_simulations}   # iterations: {args.num_iterations}")
+    print(f"graph-type: {graph_desc}    N: {N}  k: {k}  m: {args.m}")
+    print(f"STD_DRAW: {args.std_draw}  STD_LIKELIHOOD: {args.std_likelihood}    sigmoid factor: {args.sigmoid_factor}")
+    print(f"flexibility strength: {args.flex_strength}    flexibility interval: {args.flex_interval}")
+    print(f"log-beliefs: {args.log_beliefs_bool}    confirmation bias: {args.confbias_bool}    gaussian signal: {args.gaussian_bool}")
     print(f"\nRunning {args.num_simulations} simulations on a {args.graph} graph "
           f"with N={N}, k={k}, conspirators={args.conspirator_bool}, "
           f"true_mega_node={args.true_mega_node_bool}, consp_mega_node={args.consp_mega_node_bool}")
@@ -205,13 +215,14 @@ def main():
         true_hypothesis=true_hypothesis,
         num_iterations=args.num_iterations,
         confbias_bool=args.confbias_bool,
-        log_beliefs_bool=args.log_belief_bool,
+        log_beliefs_bool=args.log_beliefs_bool,
         gaussian_bool=args.gaussian_bool,
         cap=args.cap,
         std_draw=args.std_draw,
         std_likelihood=args.std_likelihood,
         flex_strength=args.flex_strength,
         flex_interval=args.flex_interval,
+        sigmoid_factor=args.sigmoid_factor,
         conspirators=conspirators,
         conspirator_bool=args.conspirator_bool,
         true_mega_node_bool=args.true_mega_node_bool,
@@ -224,7 +235,7 @@ def main():
     # === Save output ===
     filename_base = (
         f"DHT_N{N}_k{k}_{graph_desc}"
-        f"{'_logbeliefs' if args.log_belief_bool else '_linbeliefs'}"
+        f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
         f"_gaussian-stds{args.std_draw}_{int(args.flex_strength*10)}flex_confbias-{args.confbias_bool}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )

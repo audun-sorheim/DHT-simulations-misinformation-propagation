@@ -21,6 +21,7 @@ def update_beliefs(
     likelihood, 
     flexibilities, 
     true_hypothesis, 
+    sigmoid_factor=4,
     confbias_bool=True,
     log_beliefs_bool=False,
     cap=1,
@@ -123,7 +124,6 @@ def update_beliefs(
         weights = adj_matrix[neighbor_indices, i]
 
         if confbias_bool:
-            sigmoid_factor = 4
             diff = np.abs(private_beliefs[i] - neighbor_beliefs)
             norms = np.sqrt(np.sum(diff*diff, axis=1))
             x = 1.0 - norms
@@ -171,6 +171,7 @@ def simulator(
     std_likelihood=0.5,
     flex_strength=0.8,
     flex_interval=None,
+    sigmoid_factor=4,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -224,6 +225,7 @@ def simulator(
             likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=std_draw, std_likelihood=std_likelihood)
         else:
             likelihoods = get_likelihoods(N, M, true_hypothesis)
+
         flexibilities = get_flexibilities(N, flex_strength=flex_strength, flex_interval=flex_interval)
 
         if true_mega_node_bool:
@@ -248,6 +250,7 @@ def simulator(
             likelihood=likelihoods, 
             flexibilities=flexibilities,
             true_hypothesis=true_hypothesis, 
+            sigmoid_factor=sigmoid_factor,
             confbias_bool=confbias_bool, 
             log_beliefs_bool=log_beliefs_bool, 
             cap=cap,

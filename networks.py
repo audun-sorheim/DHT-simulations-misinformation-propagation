@@ -272,7 +272,7 @@ def create_graphs(num_simulations, N, seed, graph_func, **kwargs):
     Returns:
         np.ndarray: Array of adjacency matrices
     """
-    print(f"Creating {num_simulations} graphs with {graph_func.__name__}, with parameters: {kwargs}")
+    # print(f"Creating {num_simulations} graphs with {graph_func.__name__}, with parameters: {kwargs}")
 
     adj_matrices = []
 
