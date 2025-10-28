@@ -8,7 +8,7 @@ import scipy as sp
 import inspect
 from collections import Counter
 from metrics import normalize_each_row_sum, calculate_metrics
-from agents import initialize_beliefs, get_likelihoods, get_flexibilities, get_likelihoods_gaussian
+from agents import initialize_beliefs, get_likelihoods, get_flexibilities, get_likelihoods_gaussian, confirmation_bias
 
 @numba.jit(nopython=True)
 def update_beliefs(
@@ -22,6 +22,7 @@ def update_beliefs(
     flexibilities, 
     true_hypothesis, 
     sigmoid_factor=4,
+    s=0.6,
     confbias_bool=True,
     log_beliefs_bool=False,
     cap=1,
@@ -124,10 +125,13 @@ def update_beliefs(
         weights = adj_matrix[neighbor_indices, i]
 
         if confbias_bool:
-            diff = np.abs(private_beliefs[i] - neighbor_beliefs)
-            norms = np.sqrt(np.sum(diff*diff, axis=1))
-            x = 1.0 - norms
-            weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+            # === THE weights below are calculated with a sigmoid function
+            # diff = np.abs(private_beliefs[i] - neighbor_beliefs)
+            # norms = np.sqrt(np.sum(diff*diff, axis=1))
+            # x = 1.0 - norms
+            # weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+
+            weights = confirmation_bias(private_beliefs[i], neighbor_beliefs, s=s)
         
         # weights = weights / num_neighbors # Normalize weights by number of neighbors
         # weights = weights / np.sum(weights)
@@ -172,6 +176,7 @@ def simulator(
     flex_strength=0.8,
     flex_interval=None,
     sigmoid_factor=4,
+    s=0.6,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -251,6 +256,7 @@ def simulator(
             flexibilities=flexibilities,
             true_hypothesis=true_hypothesis, 
             sigmoid_factor=sigmoid_factor,
+            s=s,
             confbias_bool=confbias_bool, 
             log_beliefs_bool=log_beliefs_bool, 
             cap=cap,

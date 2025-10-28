@@ -19,6 +19,7 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --graph ${GRAPH:-"ER"} \
         --cap ${CAP:-1.0} \
         --sigmoid_factor ${SIGMOID_FACTOR:-4.0} \
+        --s ${S:-0.6} \
         --std_draw ${STD_DRAW:-0.5} \
         --std_likelihood ${STD_LIKELIHOOD:-0.5} \
         --flex_strength ${FLEX_STRENGTH:-0.8} \

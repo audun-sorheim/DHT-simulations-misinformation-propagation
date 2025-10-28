@@ -18,7 +18,8 @@ from networks import (create_graphs,
                      create_fully_connected_network,
                      create_price_network,
                      create_stochastic_block_model_network,
-                     create_watts_strogatz_network
+                     create_watts_strogatz_network,
+                     create_triangular_grid_network
 )
 from agents import assign_hypothesis_groups
 
@@ -38,6 +39,7 @@ def run_simulations(
     flex_strength=0.8,
     flex_interval=None,
     sigmoid_factor=4,
+    s=0.6,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -102,6 +104,7 @@ def run_simulations(
         flex_strength=flex_strength,
         flex_interval=flex_interval,
         sigmoid_factor=sigmoid_factor,
+        s=s,
         conspirators=conspirators, 
         conspirator_bool=conspirator_bool, 
         true_mega_node_bool=true_mega_node_bool, 
@@ -140,11 +143,12 @@ def main():
     parser.add_argument("--num_simulations", type=int, default=200, help="Number of simulations (default: 200)")
     parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
     parser.add_argument("--m", type=int, default=5, help="Number of edges per new node (BA graph only, default: 5)")
-    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA", "PRICE"], help="Graph type: ER, BA or Price (default: ER)")
+    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA", "PRICE", "SQUARE", "TRIANGULAR"], help="Graph type: ER, BA, Price, Square, triangular (default: ER)")
     parser.add_argument("--cap", type=float, default=1.0, help="Maximum signal strength (default: 1.0)")
 
     # === Additional new parameters ===
     parser.add_argument("--sigmoid_factor", type=float, default=4.0, help="Sigmoid factor (default: 4)")
+    parser.add_argument("--s", type=float, default=0.6, help="Confirmation bias factor, the standard deviation in a Gaussian function (default: 0.6)")
     parser.add_argument("--std_draw", type=float, default=1.0, help="Std dev for draw (default: 1.0)")
     parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
@@ -203,6 +207,21 @@ def main():
             m=args.m
         )
         graph_desc = f"PRICE"
+    elif args.graph == "SQUARE":
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_2d_grid_network
+        )
+        graph_desc = f"SQUARE"
+    elif args.graph == "TRIANGULAR":
+        L, K = int(np.sqrt(N)), int(np.sqrt(N))
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_triangular_grid_network,
+            K=K, L=L
+        )
+        print(K, L)
+        graph_desc = f"TRIANGULAR"
     else:
         raise ValueError(f"{args.graph} is an invalid graph type, must be 'ER', 'BA' or 'PRICE'.")
     
@@ -232,6 +251,7 @@ def main():
         flex_strength=args.flex_strength,
         flex_interval=args.flex_interval,
         sigmoid_factor=args.sigmoid_factor,
+        s=args.s,
         conspirators=conspirators,
         conspirator_bool=args.conspirator_bool,
         true_mega_node_bool=args.true_mega_node_bool,
@@ -245,22 +265,33 @@ def main():
     filename_base = (
         f"DHT_N{N}_k{k}_{graph_desc}"
         f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
-        f"_gaussian-stds{args.std_draw}_{int(args.flex_strength*10)}flex_confbias-{args.confbias_bool}"
+        f"_gaussian-stds{args.std_draw}_{str(args.flex_strength).replace('.','')}flex_confbias-{args.confbias_bool}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )
+
+    dir = "testing"
+
+    os.makedirs(dir, exist_ok=True)
 
     # Ensure unique filename
     i = 1
     filename = f"{filename_base}_{i}.npz"
-    while os.path.exists("testing/"+filename):
+    file_path = os.path.join(dir, filename)
+    while os.path.exists(file_path):
         i += 1
         filename = f"{filename_base}_{i}.npz"
+        file_path = os.path.join(dir, filename)
 
-    np.savez_compressed("testing/"+filename,
+    np.savez_compressed(file_path,
                         private=private_belief_histories,
                         public=public_belief_histories)
 
-    print(f"\nGreat Success!  Results saved to: testing/{filename}\n")
+    if args.num_simulations == 1:
+        graph_file_path = os.path.join(dir, "GRAPH-" + filename)
+        np.savez_compressed(graph_file_path, adj_matrices)
+        print(f"Saved the adjacency matrix to {graph_file_path}")
+
+    print(f"\nGreat Success!  Results saved to: {file_path}\n")
 
 
 if __name__ == "__main__":
