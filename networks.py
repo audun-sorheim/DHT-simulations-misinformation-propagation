@@ -215,7 +215,7 @@ def create_directed_barabasi_albert_graph(N, m, seed=None):
         source += 1
     return G
 
-def create_stochastic_block_model_network(N, N_groups, P, seed):
+def create_stochastic_block_model_network(N, N_groups, P, seed=None):
     """Function that creates a stochastic block model network
 
     Args:
@@ -231,7 +231,7 @@ def create_stochastic_block_model_network(N, N_groups, P, seed):
     sizes = np.array([N//N_groups])*N_groups
     return nx.stochastic_block_model(sizes, P, seed=seed, directed=True)
 
-def create_2d_grid_network(N):
+def create_2d_grid_network(N, seed):
     """Function that creates a 2d square grid network
 
     Args:
@@ -244,6 +244,22 @@ def create_2d_grid_network(N):
         print("N is not a perfect square.")
     L = int(np.sqrt(N))
     return nx.grid_2d_graph(L, L, periodic=True)
+
+def create_triangular_grid_network(N, seed, K=None, L=None):
+    """Function that creates a triangular grid network 
+
+    Args:
+        K (int): The number of rows in the grid, must be even > 2
+        L (int): The number of columns in the lattice, must be even > 4
+
+    Returns:
+        A triangular grid network
+    """
+    if K is None or L is None:
+        K = L = int(np.sqrt(N))
+    if K%2 != 0 or L%2 != 0:
+        print("K AND L must be even.")
+    return nx.triangular_lattice_graph(K, L, periodic=True)
 
 def normalize_adj_matrix_to_row_stochastic(adj_matrix):
     """
@@ -279,7 +295,8 @@ def create_graphs(num_simulations, N, seed, graph_func, **kwargs):
     for i in tqdm.tqdm(range(num_simulations), desc="creating graphs"):
         G = graph_func(N, seed=seed + (i+1), **kwargs)
         raw_matrix = np.array(nx.to_numpy_array(G), dtype=np.float64)
-        stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
-        adj_matrices.append(stochastic_matrix)
+        adj_matrices.append(raw_matrix)
+        # stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
+        # adj_matrices.append(stochastic_matrix)
 
     return np.array(adj_matrices)
