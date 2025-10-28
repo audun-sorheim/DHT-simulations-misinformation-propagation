@@ -88,6 +88,11 @@ def cognitive_dissonance(q, p):
     C = np.mean(C_agent, axis=(0,2,3))
     return C
 
+def calculate_beliefs(q, belief):
+    q_beliefs = q[:, :, :, belief]
+    B = np.mean(q_beliefs, axis=0)
+    return B
+
 @numba.jit(nopython=True)
 def normalize_each_row_sum(arr, N, M):
     """
