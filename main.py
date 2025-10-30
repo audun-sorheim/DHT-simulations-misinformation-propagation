@@ -152,7 +152,7 @@ def main():
     parser.add_argument("--std_draw", type=float, default=1.0, help="Std dev for draw (default: 1.0)")
     parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
-    parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
+    parser.add_argument("--flex_interval", type=float, nargs=2, default=None, help="Flexibility interval (two floats, e.g. 0.3 0.7)")    
     parser.add_argument("--log_beliefs_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
     parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
@@ -182,6 +182,11 @@ def main():
     # === Sociopaths / Conspirators ===
     random_agents = np.random.permutation(N)[:N].astype(np.int64)
     conspirators = random_agents[:num_conspirators] if args.conspirator_bool else np.array([], dtype=np.int64)
+
+    if args.flex_interval[0] == 0 and args.flex_interval[0] == 0:
+        flex_interval = None
+    else:
+        flex_interval = np.array([args.flex_interval[0], args.flex_interval[1]], dtype=np.float64)
 
     # === Graph generation ===
     if args.graph == "ER":
@@ -227,7 +232,7 @@ def main():
     
     print(f"# simulations: {args.num_simulations}   # iterations: {args.num_iterations}")
     print(f"graph-type: {graph_desc}    N: {N}  k: {k}  m: {args.m}")
-    print(f"STD_DRAW: {args.std_draw}  STD_LIKELIHOOD: {args.std_likelihood}    sigmoid factor: {args.sigmoid_factor}")
+    print(f"STD_DRAW: {args.std_draw}  STD_LIKELIHOOD: {args.std_likelihood}    s: {args.s}    sigmoid factor: {args.sigmoid_factor}")
     print(f"flexibility strength: {args.flex_strength}    flexibility interval: {args.flex_interval}")
     print(f"log-beliefs: {args.log_beliefs_bool}    confirmation bias: {args.confbias_bool}    gaussian signal: {args.gaussian_bool}")
     print(f"\nRunning {args.num_simulations} simulations on a {args.graph} graph "
@@ -249,7 +254,7 @@ def main():
         std_draw=args.std_draw,
         std_likelihood=args.std_likelihood,
         flex_strength=args.flex_strength,
-        flex_interval=args.flex_interval,
+        flex_interval=flex_interval,
         sigmoid_factor=args.sigmoid_factor,
         s=args.s,
         conspirators=conspirators,
