@@ -107,40 +107,46 @@ def create_price_network(N, m, seed):
     Returns:
     - G (networkx.DiGraph): Generated Price model network.
     """
-    c=m
-    gamma=1
+    if p is None:
+        p = m / (m + 1)
+
+    if not (0 <= p <= 1):
+        raise ValueError("p must be between 0 and 1")
 
     if m < 1 or m >= N:
         raise ValueError("m must satisfy 1 <= m < N")
 
-    # G = nx.DiGraph()
+    G = nx.DiGraph()
 
-    if m>1:
-        G = nx.DiGraph()
-        G.add_nodes_from(range(m))
-        for i in range(m):
-            for j in range(i):
-                G.add_edge(i, j)
-    else:
-        G = nx.DiGraph()
-        for node in range(m):
-            G.add_edge(0, node+1)
+    # Initial seed structure
+    G.add_nodes_from(range(m))
+    for i in range(m):
+        for j in range(i):
+            G.add_edge(j, i)  # edges go from older to newer
 
+    # Main growth loop
     for new_node in range(m, N):
         G.add_node(new_node)
-
         existing_nodes = np.array(G.nodes())
-        existing_nodes = existing_nodes[existing_nodes != new_node]
+        out_degrees = np.array([G.out_degree(n) for n in existing_nodes])
 
-        in_degrees = np.array([G.in_degree(n) for n in existing_nodes])
-        attachment_probs = (in_degrees + c) ** gamma
-        attachment_probs = attachment_probs / attachment_probs.sum()
+        # Preferential attachment term
+        preferential_probs = out_degrees / out_degrees.sum() if out_degrees.sum() > 0 else np.ones_like(out_degrees) / len(out_degrees)
+        # Uniform attachment term
+        uniform_probs = np.ones_like(out_degrees) / len(out_degrees)
 
-        # Choose m unique targets based on the attachment probability
-        targets = np.random.choice(existing_nodes, size=m, replace=False, p=attachment_probs)
+        attachment_probs = p * preferential_probs + (1 - p) * uniform_probs
+        attachment_probs = attachment_probs / attachment_probs.sum() # normalize
+
+        targets = np.random.choice(
+            existing_nodes,
+            size=m,
+            replace=True,
+            p=attachment_probs
+        )
 
         for target in targets:
-            G.add_edge(new_node, target)
+            G.add_edge(target, new_node)
 
     return G
 

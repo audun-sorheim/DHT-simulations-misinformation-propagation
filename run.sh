@@ -5,6 +5,7 @@ NUM_LOOPS=${NUM_LOOPS:-1}
 for ((i=1; i<=NUM_LOOPS; i++)); do
     echo "Starting to run $NUM_LOOPS simulations."
     K=${K:-$(awk "BEGIN {print 0.1 * ${N:-100}}")}
+    FLEX_INTERVAL=${FLEX_INTERVAL:-"0.0 0.0"}
 
     python3 main.py \
         --N ${N:-100} \
@@ -23,6 +24,7 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --std_draw ${STD_DRAW:-0.5} \
         --std_likelihood ${STD_LIKELIHOOD:-0.5} \
         --flex_strength ${FLEX_STRENGTH:-0.8} \
+        --flex_interval ${FLEX_INTERVAL} \
         $( [[ "${LOG_BELIEFS_BOOL:-False}" == "True" ]] && echo "--log_beliefs_bool" ) \
         $( [[ "${CONFBIAS_BOOL:-True}" == "True" ]] && echo "--confbias_bool" ) \
         $( [[ "${GAUSSIAN_BOOL:-True}" == "True" ]] && echo "--gaussian_bool" )
