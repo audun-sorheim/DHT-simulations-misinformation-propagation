@@ -84,9 +84,14 @@ def truthfulness(q, true_hypothesis):
     return T
 
 def cognitive_dissonance(q, p):
-    C_agent = np.abs(q - p)
+    C_agent = np.abs(q[0:-1] - p[1:])
     C = np.mean(C_agent, axis=(0,2,3))
     return C
+
+def calculate_beliefs(q, belief):
+    q_beliefs = q[:, :, :, belief]
+    B = np.mean(q_beliefs, axis=0)
+    return B
 
 @numba.jit(nopython=True)
 def normalize_each_row_sum(arr, N, M):

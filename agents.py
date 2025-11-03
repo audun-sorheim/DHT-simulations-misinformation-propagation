@@ -81,8 +81,6 @@ def get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=0.5, std_likelihood
     Returns:
         likelihoods (N, M): per-agent likelihoods
     """
-    std_draw = 0.5
-    std_likelihood = 0.5
     means = np.linspace(-1.0, 1.0, M)
     likelihoods = np.zeros((N, M))
     # print(means, means[true_hypothesis])
@@ -93,6 +91,24 @@ def get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=0.5, std_likelihood
             likelihoods[i, k] = gaussian_pdf(X_i, means[k], std_likelihood)
     # print(likelihoods[0])
     return likelihoods
+
+@numba.jit(nopython=True)
+def confirmation_bias(private_belief, neighbor_beliefs, s=0.6):
+    """Calculates weights based on confirmation bias represented as a Gaussian function with peak at 1.
+
+    Args:
+        private_belief (nd-array, shape=(4,)): The private beliefs of a given agent i.
+        neighbor_beliefs (nd-array, shape=(num_neighbors, 4)): The public beliefs of agent i's neighbors.
+        s (float, default=0.6): The adjusting parameter s>0, large s low confirmation bias effect, low s large confirmation bias effect.
+
+    Returns:
+        Weights: The unnormalized weights with which agent i will listen to its neighbors.
+    """
+    diff = np.abs(private_belief - neighbor_beliefs)
+    norms = np.sqrt(np.sum(diff*diff, axis=1))
+    x = 1.0 - norms
+    exponent = -(x - 1)**2/s**2
+    return np.exp(exponent)
 
 #### THE FUNC>TIONS BELOW ARE NOT USED
 

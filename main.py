@@ -18,7 +18,8 @@ from networks import (create_graphs,
                      create_fully_connected_network,
                      create_price_network,
                      create_stochastic_block_model_network,
-                     create_watts_strogatz_network
+                     create_watts_strogatz_network,
+                     create_triangular_grid_network
 )
 from agents import assign_hypothesis_groups
 
@@ -31,11 +32,14 @@ def run_simulations(
     num_iterations, 
     confbias_bool=True,
     log_beliefs_bool=False,
+    gaussian_bool=True,
     cap=1,
     std_draw=0.5,
     std_likelihood=0.5,
     flex_strength=0.8,
     flex_interval=None,
+    sigmoid_factor=4,
+    s=0.6,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -93,11 +97,14 @@ def run_simulations(
         num_iterations, 
         confbias_bool=confbias_bool,
         log_beliefs_bool=log_beliefs_bool,
+        gaussian_bool=gaussian_bool,
         cap=cap, 
         std_draw=std_draw,
         std_likelihood=std_likelihood,
         flex_strength=flex_strength,
         flex_interval=flex_interval,
+        sigmoid_factor=sigmoid_factor,
+        s=s,
         conspirators=conspirators, 
         conspirator_bool=conspirator_bool, 
         true_mega_node_bool=true_mega_node_bool, 
@@ -136,23 +143,29 @@ def main():
     parser.add_argument("--num_simulations", type=int, default=200, help="Number of simulations (default: 200)")
     parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
     parser.add_argument("--m", type=int, default=5, help="Number of edges per new node (BA graph only, default: 5)")
-    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA"], help="Graph type: ER or BA (default: ER)")
+    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA", "PRICE", "SQUARE", "TRIANGULAR"], help="Graph type: ER, BA, Price, Square, triangular (default: ER)")
     parser.add_argument("--cap", type=float, default=1.0, help="Maximum signal strength (default: 1.0)")
 
     # === Additional new parameters ===
     parser.add_argument("--sigmoid_factor", type=float, default=4.0, help="Sigmoid factor (default: 4)")
-    parser.add_argument("--std_draw", type=float, default=0.5, help="Std dev for draw (default: 0.5)")
-    parser.add_argument("--std_likelihood", type=float, default=0.5, help="Std dev for likelihood (default: 0.5)")
+    parser.add_argument("--s", type=float, default=0.6, help="Confirmation bias factor, the standard deviation in a Gaussian function (default: 0.6)")
+    parser.add_argument("--std_draw", type=float, default=1.0, help="Std dev for draw (default: 1.0)")
+    parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
     parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
-    parser.add_argument("--flex_interval", type=float, default=None, help="Flexibility interval (default: None, typical [0.3, 0.7])")
-    parser.add_argument("--log_belief_bool", action="store_true", help="Enable log-belief mode (default: False)")
+    parser.add_argument("--flex_interval", type=float, nargs=2, default=None, help="Flexibility interval (two floats, e.g. 0.3 0.7)")    
+    parser.add_argument("--log_beliefs_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
+    parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
 
     args = parser.parse_args()
 
+    # === Set default boolean values ===
+    parser.set_defaults(log_beliefs_bool=False, confbias_bool=True, gaussian_bool=True,
+                        conspirator_bool=False, true_mega_node_bool=False, consp_mega_node_bool=False)
+
     # === Initialize derived parameters ===
     N = args.N
-    k = int(0.1 * N) if args.k is None else int(args.k)
+    k = args.k
     num_conspirators = int(np.round(args.num_conspirators_frac * N, 0))
 
     # === Misc. setup ===
@@ -170,6 +183,11 @@ def main():
     random_agents = np.random.permutation(N)[:N].astype(np.int64)
     conspirators = random_agents[:num_conspirators] if args.conspirator_bool else np.array([], dtype=np.int64)
 
+    if args.flex_interval[0] == 0 and args.flex_interval[0] == 0:
+        flex_interval = None
+    else:
+        flex_interval = np.array([args.flex_interval[0], args.flex_interval[1]], dtype=np.float64)
+
     # === Graph generation ===
     if args.graph == "ER":
         adj_matrices = create_graphs(
@@ -179,15 +197,44 @@ def main():
             true_mega_node_bool=args.true_mega_node_bool,
             consp_mega_node_bool=args.consp_mega_node_bool
         )
-        graph_desc = f"ER_p{k/(N-1):.3f}"
+        graph_desc = f"ER"
     elif args.graph == "BA":
         adj_matrices = create_graphs(
             args.num_simulations, N, seed,
             graph_func=create_barabasi_albert_network,
             m=args.m
         )
-        graph_desc = f"BA_m{args.m}"
-
+        graph_desc = f"BA"
+    elif args.graph == "PRICE":
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_price_network,
+            m=args.m
+        )
+        graph_desc = f"PRICE"
+    elif args.graph == "SQUARE":
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_2d_grid_network
+        )
+        graph_desc = f"SQUARE"
+    elif args.graph == "TRIANGULAR":
+        L, K = int(np.sqrt(N)), int(np.sqrt(N))
+        adj_matrices = create_graphs(
+            args.num_simulations, N, seed,
+            graph_func=create_triangular_grid_network,
+            K=K, L=L
+        )
+        print(K, L)
+        graph_desc = f"TRIANGULAR"
+    else:
+        raise ValueError(f"{args.graph} is an invalid graph type, must be 'ER', 'BA' or 'PRICE'.")
+    
+    print(f"# simulations: {args.num_simulations}   # iterations: {args.num_iterations}")
+    print(f"graph-type: {graph_desc}    N: {N}  k: {k}  m: {args.m}")
+    print(f"STD_DRAW: {args.std_draw}  STD_LIKELIHOOD: {args.std_likelihood}    s: {args.s}    sigmoid factor: {args.sigmoid_factor}")
+    print(f"flexibility strength: {args.flex_strength}    flexibility interval: {args.flex_interval}")
+    print(f"log-beliefs: {args.log_beliefs_bool}    confirmation bias: {args.confbias_bool}    gaussian signal: {args.gaussian_bool}")
     print(f"\nRunning {args.num_simulations} simulations on a {args.graph} graph "
           f"with N={N}, k={k}, conspirators={args.conspirator_bool}, "
           f"true_mega_node={args.true_mega_node_bool}, consp_mega_node={args.consp_mega_node_bool}")
@@ -201,12 +248,15 @@ def main():
         true_hypothesis=true_hypothesis,
         num_iterations=args.num_iterations,
         confbias_bool=args.confbias_bool,
-        log_beliefs_bool=args.log_belief_bool,
+        log_beliefs_bool=args.log_beliefs_bool,
+        gaussian_bool=args.gaussian_bool,
         cap=args.cap,
         std_draw=args.std_draw,
         std_likelihood=args.std_likelihood,
         flex_strength=args.flex_strength,
-        flex_interval=args.flex_interval,
+        flex_interval=flex_interval,
+        sigmoid_factor=args.sigmoid_factor,
+        s=args.s,
         conspirators=conspirators,
         conspirator_bool=args.conspirator_bool,
         true_mega_node_bool=args.true_mega_node_bool,
@@ -218,24 +268,35 @@ def main():
 
     # === Save output ===
     filename_base = (
-        f"DHT_k{k}_{graph_desc}"
-        f"{'_logbeliefs' if args.log_belief_bool else ''}"
-        f"_gaussian_{int(args.flex_strength*10)}flex_uniformweights"
+        f"DHT_N{N}_k{k}_{graph_desc}"
+        f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
+        f"_gaussian-stds{args.std_draw}_{str(args.flex_strength).replace('.','')}flex_confbias-{args.confbias_bool}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )
+
+    dir = "testing"
+
+    os.makedirs(dir, exist_ok=True)
 
     # Ensure unique filename
     i = 1
     filename = f"{filename_base}_{i}.npz"
-    while os.path.exists(filename):
+    file_path = os.path.join(dir, filename)
+    while os.path.exists(file_path):
         i += 1
         filename = f"{filename_base}_{i}.npz"
+        file_path = os.path.join(dir, filename)
 
-    np.savez_compressed(filename,
+    np.savez_compressed(file_path,
                         private=private_belief_histories,
                         public=public_belief_histories)
 
-    print(f"\n✅ Results saved to: {filename}\n")
+    if args.num_simulations == 1:
+        graph_file_path = os.path.join(dir, "GRAPH-" + filename)
+        np.savez_compressed(graph_file_path, adj_matrices)
+        print(f"Saved the adjacency matrix to {graph_file_path}")
+
+    print(f"\nGreat Success!  Results saved to: {file_path}\n")
 
 
 if __name__ == "__main__":

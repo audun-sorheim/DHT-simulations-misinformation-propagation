@@ -107,40 +107,46 @@ def create_price_network(N, m, seed):
     Returns:
     - G (networkx.DiGraph): Generated Price model network.
     """
-    c=m
-    gamma=1
+    if p is None:
+        p = m / (m + 1)
+
+    if not (0 <= p <= 1):
+        raise ValueError("p must be between 0 and 1")
 
     if m < 1 or m >= N:
         raise ValueError("m must satisfy 1 <= m < N")
 
-    # G = nx.DiGraph()
+    G = nx.DiGraph()
 
-    if m>1:
-        G = nx.DiGraph()
-        G.add_nodes_from(range(m))
-        for i in range(m):
-            for j in range(i):
-                G.add_edge(i, j)
-    else:
-        G = nx.DiGraph()
-        for node in range(m):
-            G.add_edge(0, node+1)
+    # Initial seed structure
+    G.add_nodes_from(range(m))
+    for i in range(m):
+        for j in range(i):
+            G.add_edge(j, i)  # edges go from older to newer
 
+    # Main growth loop
     for new_node in range(m, N):
         G.add_node(new_node)
-
         existing_nodes = np.array(G.nodes())
-        existing_nodes = existing_nodes[existing_nodes != new_node]
+        out_degrees = np.array([G.out_degree(n) for n in existing_nodes])
 
-        in_degrees = np.array([G.in_degree(n) for n in existing_nodes])
-        attachment_probs = (in_degrees + c) ** gamma
-        attachment_probs = attachment_probs / attachment_probs.sum()
+        # Preferential attachment term
+        preferential_probs = out_degrees / out_degrees.sum() if out_degrees.sum() > 0 else np.ones_like(out_degrees) / len(out_degrees)
+        # Uniform attachment term
+        uniform_probs = np.ones_like(out_degrees) / len(out_degrees)
 
-        # Choose m unique targets based on the attachment probability
-        targets = np.random.choice(existing_nodes, size=m, replace=False, p=attachment_probs)
+        attachment_probs = p * preferential_probs + (1 - p) * uniform_probs
+        attachment_probs = attachment_probs / attachment_probs.sum() # normalize
+
+        targets = np.random.choice(
+            existing_nodes,
+            size=m,
+            replace=True,
+            p=attachment_probs
+        )
 
         for target in targets:
-            G.add_edge(new_node, target)
+            G.add_edge(target, new_node)
 
     return G
 
@@ -215,7 +221,7 @@ def create_directed_barabasi_albert_graph(N, m, seed=None):
         source += 1
     return G
 
-def create_stochastic_block_model_network(N, N_groups, P, seed):
+def create_stochastic_block_model_network(N, N_groups, P, seed=None):
     """Function that creates a stochastic block model network
 
     Args:
@@ -231,7 +237,7 @@ def create_stochastic_block_model_network(N, N_groups, P, seed):
     sizes = np.array([N//N_groups])*N_groups
     return nx.stochastic_block_model(sizes, P, seed=seed, directed=True)
 
-def create_2d_grid_network(N):
+def create_2d_grid_network(N, seed):
     """Function that creates a 2d square grid network
 
     Args:
@@ -244,6 +250,22 @@ def create_2d_grid_network(N):
         print("N is not a perfect square.")
     L = int(np.sqrt(N))
     return nx.grid_2d_graph(L, L, periodic=True)
+
+def create_triangular_grid_network(N, seed, K=None, L=None):
+    """Function that creates a triangular grid network 
+
+    Args:
+        K (int): The number of rows in the grid, must be even > 2
+        L (int): The number of columns in the lattice, must be even > 4
+
+    Returns:
+        A triangular grid network
+    """
+    if K is None or L is None:
+        K = L = int(np.sqrt(N))
+    if K%2 != 0 or L%2 != 0:
+        print("K AND L must be even.")
+    return nx.triangular_lattice_graph(K, L, periodic=True)
 
 def normalize_adj_matrix_to_row_stochastic(adj_matrix):
     """
@@ -272,14 +294,15 @@ def create_graphs(num_simulations, N, seed, graph_func, **kwargs):
     Returns:
         np.ndarray: Array of adjacency matrices
     """
-    print(f"Creating {num_simulations} graphs with {graph_func.__name__}, with parameters: {kwargs}")
+    # print(f"Creating {num_simulations} graphs with {graph_func.__name__}, with parameters: {kwargs}")
 
     adj_matrices = []
 
     for i in tqdm.tqdm(range(num_simulations), desc="creating graphs"):
         G = graph_func(N, seed=seed + (i+1), **kwargs)
         raw_matrix = np.array(nx.to_numpy_array(G), dtype=np.float64)
-        stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
-        adj_matrices.append(stochastic_matrix)
+        adj_matrices.append(raw_matrix)
+        # stochastic_matrix = normalize_adj_matrix_to_row_stochastic(raw_matrix)
+        # adj_matrices.append(stochastic_matrix)
 
     return np.array(adj_matrices)

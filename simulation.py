@@ -8,7 +8,7 @@ import scipy as sp
 import inspect
 from collections import Counter
 from metrics import normalize_each_row_sum, calculate_metrics
-from agents import initialize_beliefs, get_likelihoods, get_flexibilities, get_likelihoods_gaussian
+from agents import initialize_beliefs, get_likelihoods, get_flexibilities, get_likelihoods_gaussian, confirmation_bias
 
 @numba.jit(nopython=True)
 def update_beliefs(
@@ -21,6 +21,8 @@ def update_beliefs(
     likelihood, 
     flexibilities, 
     true_hypothesis, 
+    sigmoid_factor=4,
+    s=0.6,
     confbias_bool=True,
     log_beliefs_bool=False,
     cap=1,
@@ -122,14 +124,17 @@ def update_beliefs(
         # Uniform weights
         weights = adj_matrix[neighbor_indices, i]
 
-        if confbias_bool: 
-            sigmoid_factor = 4
-            diff = np.abs(private_beliefs[i] - neighbor_beliefs)
-            norms = np.sqrt(np.sum(diff*diff, axis=1))
-            x = 1.0 - norms
-            weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+        if confbias_bool:
+            # === THE weights below are calculated with a sigmoid function
+            # diff = np.abs(private_beliefs[i] - neighbor_beliefs)
+            # norms = np.sqrt(np.sum(diff*diff, axis=1))
+            # x = 1.0 - norms
+            # weights = 1.0/(1.0 + np.exp(sigmoid_factor*(x - 0.5)))
+
+            weights = confirmation_bias(private_beliefs[i], neighbor_beliefs, s=s)
         
-        weights = weights / num_neighbors # Normalize weights by number of neighbors
+        # weights = weights / num_neighbors # Normalize weights by number of neighbors
+        # weights = weights / np.sum(weights)
 
         # Confirmation bias weights
 
@@ -139,10 +144,12 @@ def update_beliefs(
             raise ValueError("Expected 1D arrays for dot product")
 
         if log_beliefs_bool:
-            log_sum = np.dot(weights, np.log(neighbor_beliefs))
+            weights = weights / np.sum(weights) # Normalize weights by sum of weights
+            log_sum = np.dot(weights, np.log(neighbor_beliefs + 1e-12))
             exp_log_sum = np.exp(log_sum) + q_prev[i, :]*(1 - flexibilities[i])
             private_beliefs[i] = exp_log_sum/np.sum(exp_log_sum, axis=0)
         else:
+            weights = weights / num_neighbors # Normalize weights by number of neighbors
             update_sum = np.dot(weights, neighbor_beliefs)*flexibilities[i] + q_prev[i, :]*(1 - flexibilities[i])
             private_beliefs[i] = update_sum/np.sum(update_sum, axis=0)
 
@@ -162,11 +169,14 @@ def simulator(
     num_iterations, 
     confbias_bool=True,
     log_beliefs_bool=False,
+    gaussian_bool=True,
     cap=1, 
     std_draw=0.5,
     std_likelihood=0.5,
     flex_strength=0.8,
     flex_interval=None,
+    sigmoid_factor=4,
+    s=0.6,
     conspirators=None, 
     conspirator_bool=False, 
     true_mega_node_bool=False, 
@@ -216,8 +226,11 @@ def simulator(
 
     for i in range(1, num_iterations+1):
 
-        # likelihoods = get_likelihoods(N, M, true_hypothesis)
-        likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=std_draw, std_likelihood=std_likelihood)
+        if gaussian_bool:
+            likelihoods = get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=std_draw, std_likelihood=std_likelihood)
+        else:
+            likelihoods = get_likelihoods(N, M, true_hypothesis)
+
         flexibilities = get_flexibilities(N, flex_strength=flex_strength, flex_interval=flex_interval)
 
         if true_mega_node_bool:
@@ -242,6 +255,8 @@ def simulator(
             likelihood=likelihoods, 
             flexibilities=flexibilities,
             true_hypothesis=true_hypothesis, 
+            sigmoid_factor=sigmoid_factor,
+            s=s,
             confbias_bool=confbias_bool, 
             log_beliefs_bool=log_beliefs_bool, 
             cap=cap,
