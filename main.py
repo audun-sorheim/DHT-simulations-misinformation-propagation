@@ -165,7 +165,7 @@ def main():
 
     # === Initialize derived parameters ===
     N = args.N
-    k = int(0.1 * N) if args.k is None else int(args.k)
+    k = args.k
     num_conspirators = int(np.round(args.num_conspirators_frac * N, 0))
 
     # === Misc. setup ===

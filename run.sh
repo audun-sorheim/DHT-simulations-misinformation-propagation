@@ -21,8 +21,8 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --cap ${CAP:-1.0} \
         --sigmoid_factor ${SIGMOID_FACTOR:-4.0} \
         --s ${S:-0.6} \
-        --std_draw ${STD_DRAW:-0.5} \
-        --std_likelihood ${STD_LIKELIHOOD:-0.5} \
+        --std_draw ${STD_DRAW:-0.75} \
+        --std_likelihood ${STD_LIKELIHOOD:-0.75} \
         --flex_strength ${FLEX_STRENGTH:-0.8} \
         --flex_interval ${FLEX_INTERVAL} \
         $( [[ "${LOG_BELIEFS_BOOL:-False}" == "True" ]] && echo "--log_beliefs_bool" ) \
