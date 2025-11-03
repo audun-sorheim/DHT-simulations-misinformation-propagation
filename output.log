@@ -1,0 +1,80 @@
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_1.npz
+
+Loop number 1 is done, 9
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_2.npz
+
+Loop number 2 is done, 8
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_3.npz
+
+Loop number 3 is done, 7
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_4.npz
+
+Loop number 4 is done, 6
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_5.npz
+
+Loop number 5 is done, 5
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_6.npz
+
+Loop number 6 is done, 4
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_7.npz
+
+Loop number 7 is done, 3
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_8.npz
+
+Loop number 8 is done, 2
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_9.npz
+
+Loop number 9 is done, 1
+Starting to run 10 simulations.
+Creating 20 graphs with create_barabasi_albert_network, with parameters: {'m': 5}
+
+Running 20 simulations on a BA graph with N=10000, k=1000, conspirators=False, true_mega_node=False, consp_mega_node=False
+
+✅ Results saved to: DHT_k1000_BA_m5_gaussian_8flex_uniformweights_T300_20sims_10.npz
+
+Loop number 10 is done, 0
