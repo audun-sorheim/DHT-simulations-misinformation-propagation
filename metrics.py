@@ -84,7 +84,7 @@ def truthfulness(q, true_hypothesis):
     return T
 
 def cognitive_dissonance(q, p):
-    C_agent = np.abs(q[0:-1] - p[1:])
+    C_agent = np.abs(q[:, 0:-1] - p[:, 1:])
     C = np.mean(C_agent, axis=(0,2,3))
     return C
 
