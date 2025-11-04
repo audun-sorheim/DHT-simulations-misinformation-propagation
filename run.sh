@@ -27,7 +27,8 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --flex_interval ${FLEX_INTERVAL} \
         $( [[ "${LOG_BELIEFS_BOOL:-False}" == "True" ]] && echo "--log_beliefs_bool" ) \
         $( [[ "${CONFBIAS_BOOL:-True}" == "True" ]] && echo "--confbias_bool" ) \
-        $( [[ "${GAUSSIAN_BOOL:-True}" == "True" ]] && echo "--gaussian_bool" )
+        $( [[ "${GAUSSIAN_BOOL:-True}" == "True" ]] && echo "--gaussian_bool" ) \
+        $( [[ "${SAVE_ALL:-False}" == "True" ]] && echo "--save_all" )
 
     LEFT=$((NUM_LOOPS - i))
     echo "Loop number $i is done, $LEFT"
