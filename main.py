@@ -22,6 +22,7 @@ from networks import (create_graphs,
                      create_triangular_grid_network
 )
 from agents import assign_hypothesis_groups
+from metrics import truthfulness, cognitive_dissonance
 
 def run_simulations(
     adj_matrices, 
@@ -156,6 +157,7 @@ def main():
     parser.add_argument("--log_beliefs_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
     parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
+    parser.add_argument("--save_all", action="store_true", help="Save all data to npz (default: False)")
 
     args = parser.parse_args()
 
@@ -287,9 +289,24 @@ def main():
         filename = f"{filename_base}_{i}.npz"
         file_path = os.path.join(dir, filename)
 
-    np.savez_compressed(file_path,
-                        private=private_belief_histories,
-                        public=public_belief_histories)
+    T0_f = truthfulness(private_belief_histories, 0)
+    T1_f = truthfulness(private_belief_histories, 1)
+    T2_f = truthfulness(private_belief_histories, 2)
+    T3_f = truthfulness(private_belief_histories, 3)
+    CD_f = cognitive_dissonance(private_belief_histories, public_belief_histories)
+
+
+    if args.save_all:
+        np.savez_compressed(file_path,
+                            private=private_belief_histories,
+                            public=public_belief_histories)
+    else:
+        np.savez_compressed("metrics_" + file_path,
+                            T0=T0_f,
+                            T1=T1_f,
+                            T2=T2_f,
+                            T3=T3_f,
+                            CD=CD_f)
 
     if args.num_simulations == 1:
         graph_file_path = os.path.join(dir, "GRAPH-" + filename)
