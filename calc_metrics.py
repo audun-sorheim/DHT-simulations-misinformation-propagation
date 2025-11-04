@@ -10,19 +10,19 @@ def main():
     parser.add_argument("--num_iterations")
     args = parser.parse_args()
 
-    T0s = np.zeros((10, 301))
-    T1s = np.zeros((10, 301))
-    T2s = np.zeros((10, 301))
-    T3s = np.zeros((10, 301))
+    T0s = np.zeros((10, int(args.num_iterations) + 1))
+    T1s = np.zeros((10, int(args.num_iterations) + 1))
+    T2s = np.zeros((10, int(args.num_iterations) + 1))
+    T3s = np.zeros((10, int(args.num_iterations) + 1))
 
-    CDs = np.zeros((10, 300))
+    CDs = np.zeros((10, int(args.num_iterations) + 1))
 
     files = [f for f in os.listdir(args.filepath) if f.endswith('.npz')]
 
     for i, f in enumerate(tqdm(files, desc="Processing files")):
         if f.endswith('.npz'):
             name = os.path.splitext(f)[0]
-            data = np.load(f)
+            data = np.load(os.path.join(args.filepath, f))
             q = data['private']
             p = data['public']
 
@@ -45,7 +45,7 @@ def main():
     
     CD_f = np.mean(CDs, axis=0)
 
-    np.savez_compressed(name,
+    np.savez_compressed("results" + name,
                         T0=T0_f,
                         T1=T1_f,
                         T2=T2_f,
