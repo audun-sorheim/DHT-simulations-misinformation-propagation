@@ -281,22 +281,32 @@ def main():
 
     os.makedirs(dir, exist_ok=True)
 
-    # Ensure unique filename
-    i = 1
-    filename = f"{filename_base}_{i}.npz"
-    file_path = os.path.join(dir, filename)
-    while os.path.exists(file_path):
-        i += 1
-        filename = f"{filename_base}_{i}.npz"
-
 
     if args.save_all:
+        # Ensure unique filename
+        i = 1
+        filename = f"{filename_base}_{i}.npz"
         file_path = os.path.join(dir, filename)
+        while os.path.exists(file_path):
+            i += 1
+            filename = f"{filename_base}_{i}.npz"
+            file_path = os.path.join(dir, filename)
         np.savez_compressed(file_path,
                             private=private_belief_histories,
                             public=public_belief_histories)
     else:
-        file_path = os.path.join(dir, "METRICS_" + filename)
+        # Ensure unique filename
+        i = 1
+        filename = f"METRICS_{filename_base}_{i}.npz"
+        file_path = os.path.join(dir, filename)
+        while os.path.exists(file_path):
+            i += 1
+            filename = f"{filename_base}_{i}.npz"
+            file_path = os.path.join(dir, filename)
+        np.savez_compressed(file_path,
+                            private=private_belief_histories,
+                            public=public_belief_histories)
+        file_path = os.path.join(dir, filename)
         T0_f = truthfulness(private_belief_histories, 0)
         T1_f = truthfulness(private_belief_histories, 1)
         T2_f = truthfulness(private_belief_histories, 2)
