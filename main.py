@@ -289,19 +289,18 @@ def main():
         filename = f"{filename_base}_{i}.npz"
         file_path = os.path.join(dir, filename)
 
-    T0_f = truthfulness(private_belief_histories, 0)
-    T1_f = truthfulness(private_belief_histories, 1)
-    T2_f = truthfulness(private_belief_histories, 2)
-    T3_f = truthfulness(private_belief_histories, 3)
-    CD_f = cognitive_dissonance(private_belief_histories, public_belief_histories)
-
 
     if args.save_all:
         np.savez_compressed(file_path,
                             private=private_belief_histories,
                             public=public_belief_histories)
     else:
-        np.savez_compressed("metrics_" + file_path,
+        T0_f = truthfulness(private_belief_histories, 0)
+        T1_f = truthfulness(private_belief_histories, 1)
+        T2_f = truthfulness(private_belief_histories, 2)
+        T3_f = truthfulness(private_belief_histories, 3)
+        CD_f = cognitive_dissonance(private_belief_histories, public_belief_histories)
+        np.savez_compressed("METRICS_" + file_path,
                             T0=T0_f,
                             T1=T1_f,
                             T2=T2_f,
