@@ -158,6 +158,7 @@ def main():
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
     parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
     parser.add_argument("--save_all", action="store_true", help="Save all data to npz (default: False)")
+    parser.add_argument("--dir", type=str, default="test", help="Save results to this folder (default: test)")
 
     args = parser.parse_args()
 
@@ -276,7 +277,7 @@ def main():
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )
 
-    dir = "testing"
+    dir = args.dir
 
     os.makedirs(dir, exist_ok=True)
 
@@ -287,20 +288,21 @@ def main():
     while os.path.exists(file_path):
         i += 1
         filename = f"{filename_base}_{i}.npz"
-        file_path = os.path.join(dir, filename)
 
 
     if args.save_all:
+        file_path = os.path.join(dir, filename)
         np.savez_compressed(file_path,
                             private=private_belief_histories,
                             public=public_belief_histories)
     else:
+        file_path = os.path.join(dir, "METRICS_" + filename)
         T0_f = truthfulness(private_belief_histories, 0)
         T1_f = truthfulness(private_belief_histories, 1)
         T2_f = truthfulness(private_belief_histories, 2)
         T3_f = truthfulness(private_belief_histories, 3)
         CD_f = cognitive_dissonance(private_belief_histories, public_belief_histories)
-        np.savez_compressed("METRICS_" + file_path,
+        np.savez_compressed(file_path,
                             T0=T0_f,
                             T1=T1_f,
                             T2=T2_f,
