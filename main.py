@@ -200,14 +200,14 @@ def main():
             true_mega_node_bool=args.true_mega_node_bool,
             consp_mega_node_bool=args.consp_mega_node_bool
         )
-        graph_desc = f"ER"
+        graph_desc = f"ER_k{k}"
     elif args.graph == "BA":
         adj_matrices = create_graphs(
             args.num_simulations, N, seed,
             graph_func=create_barabasi_albert_network,
             m=args.m
         )
-        graph_desc = f"BA"
+        graph_desc = f"BA_m{args.m}"
     elif args.graph == "PRICE":
         adj_matrices = create_graphs(
             args.num_simulations, N, seed,
@@ -271,7 +271,7 @@ def main():
 
     # === Save output ===
     filename_base = (
-        f"DHT_N{N}_k{k}_{graph_desc}"
+        f"DHT_N{N}_{graph_desc}"
         f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
         f"_gaussian-stds{args.std_draw}_{str(args.flex_strength).replace('.','')}flex_confbias-{args.confbias_bool}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
@@ -301,7 +301,7 @@ def main():
         file_path = os.path.join(dir, filename)
         while os.path.exists(file_path):
             i += 1
-            filename = f"{filename_base}_{i}.npz"
+            filename = f"METRICS_{filename_base}_{i}.npz"
             file_path = os.path.join(dir, filename)
         np.savez_compressed(file_path,
                             private=private_belief_histories,
