@@ -270,10 +270,13 @@ def main():
     )
 
     # === Save output ===
+    # f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
+    # f"flex_confbias-{args.confbias_bool}"
     filename_base = (
         f"DHT_N{N}_{graph_desc}"
-        f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
-        f"_gaussian-stds{args.std_draw}_{str(args.flex_strength).replace('.','')}flex_confbias-{args.confbias_bool}"
+        f"_S{str(args.s).replace('.', '')}"
+        f"_{str(args.flex_strength).replace('.', '')}"
+        f"_gaussian-stds{args.std_draw}"
         f"_T{args.num_iterations}_{args.num_simulations}sims"
     )
 
