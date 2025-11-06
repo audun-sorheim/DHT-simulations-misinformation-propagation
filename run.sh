@@ -8,7 +8,7 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
     FLEX_INTERVAL=${FLEX_INTERVAL:-"0.0 0.0"}
 
     python3 main.py \
-        --N ${N:-4000} \
+        --N ${N:-4096} \
         --num_conspirators_frac ${NUM_CONSPIRATORS_FRAC:-0.05} \
         $( [[ "${CONSPIRATOR_BOOL:-False}" == "True" ]] && echo "--conspirator_bool" ) \
         $( [[ "${TRUE_MEGA_NODE_BOOL:-False}" == "True" ]] && echo "--true_mega_node_bool" ) \

@@ -5,7 +5,7 @@ from pathlib import Path
 
 # === CONSTANT DEFAULTS ===
 defaults = {
-    "N": 4000,
+    "N": 4096,
     "K": 10,
     "NUM_ITERATIONS": 200,
     "NUM_SIMULATIONS": 20,
@@ -30,7 +30,7 @@ S_values = [
     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 4, 8, 16
 ]
 
-DIR_base = "N4e3/SQUARE"
+DIR_base = "N4096/SQUARE"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 56  # run 42 simulations at the same time
