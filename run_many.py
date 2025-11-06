@@ -33,7 +33,7 @@ S_values = [
 DIR_base = "N4e3/SQUARE"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 42  # run 42 simulations at the same time
+MAX_PARALLEL = 56  # run 42 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
