@@ -78,15 +78,23 @@ def calculate_median(array):
     """
     return np.median(array, axis=0)
 
-def truthfulness(q, true_hypothesis):
+def truthfulness(q, true_hypothesis, return_std=False):
     q_truth = q[:, :, :, true_hypothesis]
-    T = np.mean(q_truth, axis=(0,2))
-    return T
+    per_sim_mean = np.mean(q_truth, axis=2)
+    T_mean = np.mean(per_sim_mean, axis=0)
+    if return_std:
+        T_std = np.std(per_sim_mean, axis=0)
+        return T_mean, T_std
+    return T_mean
 
-def cognitive_dissonance(q, p):
+def cognitive_dissonance(q, p, return_std=False):
     C_agent = np.abs(q[0:-1] - p[1:])
-    C = np.mean(C_agent, axis=(0,2,3))
-    return C
+    per_sim_mean = np.mean(C_agent, axis=(2,3))
+    C_mean = np.mean(per_sim_mean, axis=0)    
+    if return_std:
+        C_std = np.std(per_sim_mean, axis=0)
+        return C_mean, C_std    
+    return C_mean
 
 def calculate_beliefs(q, belief):
     q_beliefs = q[:, :, :, belief]

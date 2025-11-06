@@ -307,17 +307,22 @@ def main():
                             private=private_belief_histories,
                             public=public_belief_histories)
         file_path = os.path.join(dir, filename)
-        T0_f = truthfulness(private_belief_histories, 0)
-        T1_f = truthfulness(private_belief_histories, 1)
-        T2_f = truthfulness(private_belief_histories, 2)
-        T3_f = truthfulness(private_belief_histories, 3)
-        CD_f = cognitive_dissonance(private_belief_histories, public_belief_histories)
+        T0_f, T0_f_std = truthfulness(private_belief_histories, 0, return_std=True)
+        T1_f, T1_f_std = truthfulness(private_belief_histories, 1, return_std=True)
+        T2_f, T2_f_std = truthfulness(private_belief_histories, 2, return_std=True)
+        T3_f, T3_f_std = truthfulness(private_belief_histories, 3, return_std=True)
+        CD_f, CD_f_std = cognitive_dissonance(private_belief_histories, public_belief_histories, return_std=True)
         np.savez_compressed(file_path,
                             T0=T0_f,
                             T1=T1_f,
                             T2=T2_f,
                             T3=T3_f,
-                            CD=CD_f)
+                            T0_std=T0_f_std,
+                            T1_std=T1_f_std,
+                            T2_std=T2_f_std,
+                            T3_std=T3_f_std,
+                            CD=CD_f,
+                            CD_std=CD_f_std)
 
     if args.num_simulations == 1:
         graph_file_path = os.path.join(dir, "GRAPH-" + filename)
