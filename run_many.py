@@ -16,7 +16,7 @@ defaults = {
     "CONFBIAS_BOOL": "True",
     "NUM_LOOPS": 10,
     "SAVE_ALL": "False",
-    "GRAPH": "SQUARE",   # fixed graph type
+    "GRAPH": "BA",   # fixed graph type
 }
 
 # === PARAMETER ARRAYS ===
@@ -30,7 +30,7 @@ S_values = [
     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
 ]
 
-DIR_base = "N4096/SQUARE"
+DIR_base = "N4096/BA"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 56  # run 42 simulations at the same time
@@ -52,8 +52,8 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
         "DIR": f"{DIR_base}/flex{str(FLEX_STRENGTH).replace('.', '')}"
     })
 
-    out_file = Path("logs") / f"run_{i:03d}_square_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.out"
-    err_file = Path("logs") / f"run_{i:03d}_square_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.err"
+    out_file = Path("logs") / f"run_{i:03d}_BA_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.out"
+    err_file = Path("logs") / f"run_{i:03d}_BA_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.err"
 
     cmd_vars = " ".join(f"{k}={v}" for k, v in env.items())
     full_cmd = f"bash -c \"{cmd_vars} ./run.sh\""
@@ -75,4 +75,4 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 for p in processes:
     p.wait()
 
-print("\n✅ All 336 simulations complete. Check logs/ for output.")
+print("\n✅ All 384 simulations complete. Check logs/ for output.")

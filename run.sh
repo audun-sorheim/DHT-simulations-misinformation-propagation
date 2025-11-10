@@ -17,7 +17,7 @@ for ((i=1; i<=NUM_LOOPS; i++)); do
         --num_simulations ${NUM_SIMULATIONS:-20} \
         --k ${K:-10} \
         --m ${M:-5} \
-        --graph ${GRAPH:-"SQUARE"} \
+        --graph ${GRAPH:-"BA"} \
         --cap ${CAP:-1.0} \
         --sigmoid_factor ${SIGMOID_FACTOR:-4.0} \
         --s ${S:-0.6} \
