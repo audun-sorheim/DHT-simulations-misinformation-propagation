@@ -21,19 +21,23 @@ defaults = {
 
 # === PARAMETER ARRAYS ===
 FLEX_STRENGTH_values = [
-    0.050, 0.100, 0.150, 0.200, 0.250, 0.300, 0.350, 0.400,
+    0.005, 0.01, 0.02, 0.03, 0.04, 0.050, 0.06, 0.07, 0.08, 0.09,
+    0.100, 0.150, 0.200, 0.250, 0.300, 0.350, 0.400,
     0.450, 0.500, 0.550, 0.600, 0.650, 0.700, 0.750, 0.800,
     0.850, 0.900, 0.950, 0.980, 0.985, 0.990, 0.995, 1.000
 ]
 
-S_values = [
-    0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
-]
+# S_values = [
+#     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
+# ]
+
+S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 1.5]
+F_new = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
 DIR_base = "N4096/BA"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 56  # run 42 simulations at the same time
+MAX_PARALLEL = 30  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
