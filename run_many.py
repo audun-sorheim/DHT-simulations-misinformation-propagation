@@ -16,7 +16,7 @@ defaults = {
     "CONFBIAS_BOOL": "True",
     "NUM_LOOPS": 10,
     "SAVE_ALL": "False",
-    "GRAPH": "BA",   # fixed graph type
+    "GRAPH": "SQUARE",   # fixed graph type
 }
 
 # === PARAMETER ARRAYS ===
@@ -34,7 +34,7 @@ FLEX_STRENGTH_values = [
 S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 1.5]
 F_new = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
-DIR_base = "N4096/BA"
+DIR_base = "N4096/SQUARE"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 30  # run 30 simulations at the same time
