@@ -26,7 +26,7 @@ defaults = {
 #     0.450, 0.500, 0.550, 0.600, 0.650, 0.700, 0.750, 0.800,
 #     0.850, 0.900, 0.950, 0.980, 0.985, 0.990, 0.995, 1.000
 # ]
-FLEX_STRENGTH_values = 0.5
+FLEX_STRENGTH_values = [0.5]
 
 # S_values = [
 #     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
@@ -85,4 +85,4 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 for p in processes:
     p.wait()
 
-print("\n✅ All 384 simulations complete. Check logs/ for output.")
+print("\n✅ All 500 simulations complete. Check logs/ for output.")
