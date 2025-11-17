@@ -26,15 +26,21 @@ defaults = {
 #     0.450, 0.500, 0.550, 0.600, 0.650, 0.700, 0.750, 0.800,
 #     0.850, 0.900, 0.950, 0.980, 0.985, 0.990, 0.995, 1.000
 # ]
+FLEX_STRENGTH_values = 0.5
 
-S_values = [
-    0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
-]
+# S_values = [
+#     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
+# ]
 
 # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
+start = 0.08
+end = 0.4
+n = 500
+step = (end - start) / (n - 1)
+S_values = [start + i * step for i in range(n)]
+# FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
-DIR_base = "N4096/SQUARE"
+DIR_base = "S_phase/SQUARE"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 30  # run 30 simulations at the same time
