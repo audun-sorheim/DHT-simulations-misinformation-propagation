@@ -40,6 +40,19 @@ step = (end - start) / (n - 1)
 S_values = [start + i * step for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
+def encode6(x):
+    """
+    Encode float x into a 6-significant-digit token without a hash.
+    Examples:
+        0.304448897795 → '0p304449'
+        0.005 → '0p005'
+        1.2 → '1p2'
+        16 → '16'
+    """
+    # Format with 6 significant digits
+    s = f"{x:.g}"
+    return s.replace('.', 'p')
+
 DIR_base = "S_phase/SQUARE"
 
 # === PARALLELISM SETTINGS ===
@@ -55,15 +68,19 @@ processes = []
 
 # === LAUNCH LOOP ===
 for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
+
+    s_token = encode6(S)
+    f_token = encode6(FLEX_STRENGTH)
+
     env = defaults.copy()
     env.update({
         "S": S,
         "FLEX_STRENGTH": FLEX_STRENGTH,
-        "DIR": f"{DIR_base}/flex{str(FLEX_STRENGTH).replace('.', '')}"
+        "DIR": f"{DIR_base}/flex{f_token}"
     })
 
-    out_file = Path("logs") / f"run_{i:03d}_BA_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.out"
-    err_file = Path("logs") / f"run_{i:03d}_BA_s{str(S).replace('.', '')}_flex{str(FLEX_STRENGTH).replace('.', '')}.err"
+    out_file = Path("logs") / f"run_{i:03d}_SQUARE_s{s_token}_flex{f_token}.out"
+    err_file = Path("logs") / f"run_{i:03d}_SQUARE_s{s_token}_flex{f_token}.err"
 
     cmd_vars = " ".join(f"{k}={v}" for k, v in env.items())
     full_cmd = f"bash -c \"{cmd_vars} ./run.sh\""
