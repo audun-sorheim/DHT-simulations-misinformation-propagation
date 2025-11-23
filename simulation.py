@@ -239,8 +239,10 @@ def simulator(
             private_beliefs[-1] = consp_mega_node_beliefs
 
         if i == 0:
-            p_prev = np.zeros((N,M))
-            q_prev = np.zeros((N,M))
+            # p_prev = np.zeros((N,M))
+            # q_prev = np.zeros((N,M))
+            p_prev = public_belief_history[0]
+            q_prev = private_belief_history[0]
         else:
             p_prev = public_belief_history[i-1]
             q_prev = private_belief_history[i-1]
