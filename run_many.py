@@ -33,8 +33,8 @@ FLEX_STRENGTH_values = [0.5]
 # ]
 
 # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-start = 0.08
-end = 0.4
+start = 0.05
+end = 0.35
 n = 500
 step = (end - start) / (n - 1)
 S_values = [start + i * step for i in range(n)]
