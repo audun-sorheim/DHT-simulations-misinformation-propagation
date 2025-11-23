@@ -50,7 +50,7 @@ def encode6(x):
         16 → '16'
     """
     # Format with 6 significant digits
-    s = f"{x:.g}"
+    s = f"{x:.6g}"
     return s.replace('.', 'p')
 
 DIR_base = "S_phase/SQUARE"
