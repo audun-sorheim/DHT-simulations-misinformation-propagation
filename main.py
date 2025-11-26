@@ -272,7 +272,7 @@ def main():
     # === Save output ===
     # f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
     # f"flex_confbias-{args.confbias_bool}"
-    s_str = f"{args.s:.3f}".replace('.', 'p').rstrip('0').rstrip('p')
+    s_str = f"{args.s:.5f}".replace('.', 'p').rstrip('0').rstrip('p')
     f_str = f"{args.flex_strength:.3f}".replace('.', 'p').rstrip('0').rstrip('p')
     filename_base = (
         f"DHT_N{N}_{graph_desc}"
