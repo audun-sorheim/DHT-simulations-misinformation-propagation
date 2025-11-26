@@ -35,23 +35,16 @@ FLEX_STRENGTH_values = [0.5]
 # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
 start = 0.05
 end = 0.35
-n = 500
+n = 401
 step = (end - start) / (n - 1)
-S_values = [start + i * step for i in range(n)]
+S_values = [round(start + i * step, 5) for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
-def encode6(x):
-    """
-    Encode float x into a 6-significant-digit token without a hash.
-    Examples:
-        0.304448897795 → '0p304449'
-        0.005 → '0p005'
-        1.2 → '1p2'
-        16 → '16'
-    """
-    # Format with 6 significant digits
-    s = f"{x:.6g}"
-    return s.replace('.', 'p')
+def encode_s(x):
+    return f"{x:.5f}".replace('.', 'p')
+
+def encode_f(x):
+    return f"{x:g}".replace('.', 'p')
 
 DIR_base = "S_phase/SQUARE"
 
@@ -69,8 +62,8 @@ processes = []
 # === LAUNCH LOOP ===
 for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 
-    s_token = encode6(S)
-    f_token = encode6(FLEX_STRENGTH)
+    s_token = encode_s(S)                              
+    f_token = encode_f(FLEX_STRENGTH)
 
     env = defaults.copy()
     env.update({
