@@ -49,7 +49,7 @@ def encode_f(x):
 DIR_base = "S_phase/SQUARE"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 60  # run 30 simulations at the same time
+MAX_PARALLEL = 50  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
@@ -95,4 +95,4 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 for p in processes:
     p.wait()
 
-print("\n✅ All 500 simulations complete. Check logs/ for output.")
+print("\n✅ All 401 simulations complete. Check logs/ for output.")
