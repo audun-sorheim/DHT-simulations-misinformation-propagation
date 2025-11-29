@@ -26,22 +26,25 @@ defaults = {
 #     0.450, 0.500, 0.550, 0.600, 0.650, 0.700, 0.750, 0.800,
 #     0.850, 0.900, 0.950, 0.980, 0.985, 0.990, 0.995, 1.000
 # ]
-FLEX_STRENGTH_values = [0.5]
+# FLEX_STRENGTH_values = [0.5]
 
-# S_values = [
-#     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
-# ]
+# # S_values = [
+# #     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
+# # ]
 
-# S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-start = 0.005
-end = 0.05
-# n = 401
-# step = (end - start) / (n - 1)
-step = 0.00075
-n = int((end - start) / step + 1)
-print(n, type(n))
-S_values = [round(start + i * step, 5) for i in range(n)]
+# # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
+# start = 0.005
+# end = 0.05
+# # n = 401
+# # step = (end - start) / (n - 1)
+# step = 0.00075
+# n = int((end - start) / step + 1)
+# print(n, type(n))
+# S_values = [round(start + i * step, 5) for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
+
+FLEX_STRENGTH_values = [0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
+S_values = [0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
 
 def encode_s(x):
     return f"{x:.5f}".replace('.', 'p')
@@ -49,7 +52,7 @@ def encode_s(x):
 def encode_f(x):
     return f"{x:g}".replace('.', 'p')
 
-DIR_base = "S_phase/SQUARE"
+DIR_base = "critical/SQUARE"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 25  # run 30 simulations at the same time
@@ -98,4 +101,4 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 for p in processes:
     p.wait()
 
-print(f"\n✅ All {n} simulations complete. Check logs/ for output.")
+print(f"\n✅ All {len(combos)} simulations complete. Check logs/ for output.")
