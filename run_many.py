@@ -38,7 +38,8 @@ end = 0.05
 # n = 401
 # step = (end - start) / (n - 1)
 step = 0.00075
-n = (end - start) / step + 1
+n = int((end - start) / step + 1)
+print(n, type(n))
 S_values = [round(start + i * step, 5) for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
