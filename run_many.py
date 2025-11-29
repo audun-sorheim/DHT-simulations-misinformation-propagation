@@ -33,10 +33,12 @@ FLEX_STRENGTH_values = [0.5]
 # ]
 
 # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-start = 0.05
-end = 0.35
-n = 401
-step = (end - start) / (n - 1)
+start = 0.005
+end = 0.05
+# n = 401
+# step = (end - start) / (n - 1)
+step = 0.00075
+n = (end - start) / step + 1
 S_values = [round(start + i * step, 5) for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
@@ -49,7 +51,7 @@ def encode_f(x):
 DIR_base = "S_phase/SQUARE"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 50  # run 30 simulations at the same time
+MAX_PARALLEL = 25  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
@@ -95,4 +97,4 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
 for p in processes:
     p.wait()
 
-print("\n✅ All 401 simulations complete. Check logs/ for output.")
+print(f"\n✅ All {n} simulations complete. Check logs/ for output.")
