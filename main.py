@@ -142,29 +142,29 @@ def main():
     parser.add_argument("--consp_mega_node_bool", action="store_true", help="Enable conspiring mega-node (default: False)")
     parser.add_argument("--num_iterations", type=int, default=150, help="Number of iterations (default: 150)")
     parser.add_argument("--num_simulations", type=int, default=200, help="Number of simulations (default: 200)")
-    parser.add_argument("--k", type=float, default=None, help="Average degree parameter (default: 0.1 * N)")
+    parser.add_argument("--k", type=float, default=10, help="Average degree parameter (default: 0.1 * N)")
     parser.add_argument("--m", type=int, default=5, help="Number of edges per new node (BA graph only, default: 5)")
-    parser.add_argument("--graph", type=str, default="ER", choices=["ER", "BA", "PRICE", "SQUARE", "TRIANGULAR"], help="Graph type: ER, BA, Price, Square, triangular (default: ER)")
+    parser.add_argument("--graph", type=str, default="SQUARE", choices=["ER", "BA", "PRICE", "SQUARE", "TRIANGULAR"], help="Graph type: ER, BA, Price, Square, triangular (default: ER)")
     parser.add_argument("--cap", type=float, default=1.0, help="Maximum signal strength (default: 1.0)")
 
     # === Additional new parameters ===
     parser.add_argument("--sigmoid_factor", type=float, default=4.0, help="Sigmoid factor (default: 4)")
     parser.add_argument("--s", type=float, default=0.6, help="Confirmation bias factor, the standard deviation in a Gaussian function (default: 0.6)")
-    parser.add_argument("--std_draw", type=float, default=1.0, help="Std dev for draw (default: 1.0)")
-    parser.add_argument("--std_likelihood", type=float, default=1.0, help="Std dev for likelihood (default: 1.0)")
-    parser.add_argument("--flex_strength", type=float, default=0.5, help="Flexibility strength (default: 0.5)")
-    parser.add_argument("--flex_interval", type=float, nargs=2, default=None, help="Flexibility interval (two floats, e.g. 0.3 0.7)")    
+    parser.add_argument("--std_draw", type=float, default=0.75, help="Std dev for draw (default: 1.0)")
+    parser.add_argument("--std_likelihood", type=float, default=0.75, help="Std dev for likelihood (default: 1.0)")
+    parser.add_argument("--flex_strength", type=float, default=0.8, help="Flexibility strength (default: 0.5)")
+    parser.add_argument("--flex_interval", type=float, nargs=2, default=[0,0], help="Flexibility interval (two floats, e.g. 0.3 0.7)")    
     parser.add_argument("--log_beliefs_bool", action="store_true", help="Enable log-belief mode (default: False)")
     parser.add_argument("--confbias_bool", action="store_true", help="Enable confirmation bias (default: True)")
     parser.add_argument("--gaussian_bool", action="store_true", help="Use Gaussian signals (default: True)")
     parser.add_argument("--save_all", action="store_true", help="Save all data to npz (default: False)")
     parser.add_argument("--dir", type=str, default="test", help="Save results to this folder (default: test)")
 
-    args = parser.parse_args()
-
     # === Set default boolean values ===
     parser.set_defaults(log_beliefs_bool=False, confbias_bool=True, gaussian_bool=True,
                         conspirator_bool=False, true_mega_node_bool=False, consp_mega_node_bool=False)
+
+    args = parser.parse_args()
 
     # === Initialize derived parameters ===
     N = args.N
@@ -273,7 +273,7 @@ def main():
     # f"{'_logbeliefs' if args.log_beliefs_bool else '_linbeliefs'}"
     # f"flex_confbias-{args.confbias_bool}"
     s_str = f"{args.s:.5f}".replace('.', 'p').rstrip('0').rstrip('p')
-    f_str = f"{args.flex_strength:.3f}".replace('.', 'p').rstrip('0').rstrip('p')
+    f_str = f"{args.flex_strength:.5f}".replace('.', 'p').rstrip('0').rstrip('p')
     filename_base = (
         f"DHT_N{N}_{graph_desc}"
         f"_S{s_str}_flex{f_str}"
