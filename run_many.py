@@ -63,7 +63,7 @@ def encode_s(x):
     return f"{x:.5f}".replace('.', 'p')
 
 def encode_f(x):
-    return f"{x:g}".replace('.', 'p')
+    return f"{x:5f}".replace('.', 'p')
 
 DIR_base = "critical/SQUARE"
 
@@ -88,7 +88,7 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
     env.update({
         "S": S,
         "FLEX_STRENGTH": FLEX_STRENGTH,
-        "DIR": f"{DIR_base}/flex{f_token}"
+        "DIR": f"{DIR_base}/s{s_token}"
     })
 
     out_file = Path("logs") / f"run_{i:03d}_SQUARE_s{s_token}_flex{f_token}.out"
