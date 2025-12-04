@@ -49,14 +49,15 @@ defaults = {
 # FLEX_STRENGTH_values = [0.98, 0.985, 0.99, 0.995, 0.999, 0.9995, 0.9999]
 # S_values = [10, 100, 1000, 10000, 100000, 1000000]
 
-start = 0.01
-end = 0.31
-# n = 401
-# step = (end - start) / (n - 1)
-step = 0.00075
-n = int((end - start) / step + 1)
-print(n, type(n))
-FLEX_STRENGTH_values = [round(start + i * step, 5) for i in range(n)]
+# start = 0.01
+# end = 0.31
+# # n = 401
+# # step = (end - start) / (n - 1)
+# step = 0.00075
+# n = int((end - start) / step + 1)
+# print(n, type(n))
+# FLEX_STRENGTH_values = [round(start + i * step, 5) for i in range(n)]
+FLEX_STRENGTH_values = [0.00025, 0.001, 0.00175, 0.0025, 0.00325, 0.004, 0.00475, 0.0055, 0.00625, 0.007, 0.00775, 0.0085, 0.00925, 0.01]
 S_values = [1.0]
 
 def encode_s(x):
