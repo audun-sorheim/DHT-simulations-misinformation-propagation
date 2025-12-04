@@ -57,7 +57,10 @@ defaults = {
 # n = int((end - start) / step + 1)
 # print(n, type(n))
 # FLEX_STRENGTH_values = [round(start + i * step, 5) for i in range(n)]
-FLEX_STRENGTH_values = [0.00025, 0.001, 0.00175, 0.0025, 0.00325, 0.004, 0.00475, 0.0055, 0.00625, 0.007, 0.00775, 0.0085, 0.00925, 0.01]
+FLEX_STRENGTH_values = [0.00025, 0.001, 0.00175, 0.0025, 0.00325, 0.004, 0.00475, 0.0055, 0.00625, 0.007, 0.00775, 0.0085, 0.00925, 0.01,
+                        0.31075, 0.3115, 0.31225, 0.313, 0.31375, 0.3145, 0.31525, 0.316, 0.31675, 0.3175, 0.31825, 0.319, 0.31975, 
+                        0.3205, 0.32125, 0.322, 0.32275, 0.3235, 0.32425, 0.325, 0.32575, 0.3265, 0.32725, 0.328, 0.32875, 0.3295, 
+                        0.33025, 0.331, 0.33175, 0.3325, 0.33325, 0.334, 0.33475, 0.3355, 0.33625, 0.337, 0.33775, 0.3385, 0.33925, 0.34]
 S_values = [1.0]
 
 def encode_s(x):
@@ -69,7 +72,7 @@ def encode_f(x):
 DIR_base = "critical/SQUARE"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 50  # run 30 simulations at the same time
+MAX_PARALLEL = 54  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
