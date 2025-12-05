@@ -5,7 +5,7 @@ from pathlib import Path
 
 # === CONSTANT DEFAULTS ===
 defaults = {
-    "N": 1024,
+    "N": 256,
     "K": 10,
     "NUM_ITERATIONS": 200,
     "NUM_SIMULATIONS": 20,
