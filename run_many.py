@@ -5,7 +5,7 @@ from pathlib import Path
 
 # === CONSTANT DEFAULTS ===
 defaults = {
-    "N": 1024,
+    "N": 4096,
     "K": 10,
     "NUM_ITERATIONS": 200,
     "NUM_SIMULATIONS": 20,
@@ -33,13 +33,13 @@ FLEX_STRENGTH_values = [0.5]
 # # ]
 
 # # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-start = 0.005
-end = 0.35
-# n = 401
-# step = (end - start) / (n - 1)
-step = 0.00075
-n = int((end - start) / step + 1)
-S_values = [round(start + i * step, 5) for i in range(n)]
+# start = 0.005
+# end = 0.35
+# # n = 401
+# # step = (end - start) / (n - 1)
+# step = 0.00075
+# n = int((end - start) / step + 1)
+# S_values = [round(start + i * step, 5) for i in range(n)]
 # FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
 # FLEX_STRENGTH_values = [0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01]
@@ -60,7 +60,8 @@ S_values = [round(start + i * step, 5) for i in range(n)]
 #                         0.31075, 0.3115, 0.31225, 0.313, 0.31375, 0.3145, 0.31525, 0.316, 0.31675, 0.3175, 0.31825, 0.319, 0.31975, 
 #                         0.3205, 0.32125, 0.322, 0.32275, 0.3235, 0.32425, 0.325, 0.32575, 0.3265, 0.32725, 0.328, 0.32875, 0.3295, 
 #                         0.33025, 0.331, 0.33175, 0.3325, 0.33325, 0.334, 0.33475, 0.3355, 0.33625, 0.337, 0.33775, 0.3385, 0.33925, 0.34]
-# S_values = [1.0]
+FLEX_STRENGTH_values = [1e-6,2.5e-6, 5e-6, 7.5e-6, 1e-5, 2.5e-5, 5e-5, 7.5e-5, 0.0001]
+S_values = [1.0]
 
 def encode_s(x):
     return f"{x:.5f}".replace('.', 'p')
@@ -68,7 +69,7 @@ def encode_s(x):
 def encode_f(x):
     return f"{x:5f}".replace('.', 'p')
 
-DIR_base = "s_phase/SQUARE"
+DIR_base = "f_phase/SQUARE"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 46  # run 30 simulations at the same time
