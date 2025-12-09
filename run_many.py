@@ -72,7 +72,7 @@ def encode_f(x):
 DIR_base = "critical/SQUARE"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 9  # run 30 simulations at the same time
+MAX_PARALLEL = 21  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
