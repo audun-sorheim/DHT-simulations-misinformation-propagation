@@ -99,7 +99,7 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
     env.update({
         "S": S,
         "FLEX_STRENGTH": FLEX_STRENGTH,
-        "DIR": f"{DIR_base}/s{s_token}"
+        "DIR": f"{DIR_base}/f{f_token}"
     })
 
     out_file = Path("logs") / f"run_{i:03d}_SQUARE_s{s_token}_flex{f_token}.out"
