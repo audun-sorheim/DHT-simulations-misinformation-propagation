@@ -76,7 +76,7 @@ def encode_s(x):
 def encode_f(x):
     return f"{x:5f}".replace('.', 'p')
 
-DIR_base = "N4096_BA/SQUARE"
+DIR_base = "N4096_BA/BA"
 
 # === PARALLELISM SETTINGS ===
 MAX_PARALLEL = 33  # run 30 simulations at the same time
