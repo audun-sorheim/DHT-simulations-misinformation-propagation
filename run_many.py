@@ -28,12 +28,12 @@ defaults = {
 # ]
 # FLEX_STRENGTH_values = [0.5]
 
-S_values = [
-    0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
-]
+# S_values = [
+#     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.6, 2, 4, 8, 16
+# ]
 
 # S_values = [0.01, 0.02, 0.04, 0.06, 0.08, 0.15]
-FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
+# FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 
 # start = 0.005
 # end = 0.35
@@ -50,14 +50,15 @@ FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 # FLEX_STRENGTH_values = [0.98, 0.985, 0.99, 0.995, 0.999, 0.9995, 0.9999]
 # S_values = [10, 100, 1000, 10000, 100000, 1000000]
 
-# start = 0.00025
-# end = 0.34
+start = 0.00025
+end = 0.34
 # # n = 401
 # # step = (end - start) / (n - 1)
-# step = 0.00075
-# n = int((end - start) / step + 1)
-# print(n, type(n))
-# FLEX_STRENGTH_values = [round(start + i * step, 5) for i in range(n)]
+step = 0.00075
+n = int((end - start) / step + 1)
+print(n, type(n))
+FLEX_STRENGTH_values = [round(start + i * step, 5) for i in range(n)]
+FLEX_STRENGTH_values.extend([0.0001, 0.0002, 0.0004, 0.0006, 0.0008, 0.00001, 0.00002, 0.00004, 0.00006, 0.00008])
 # FLEX_STRENGTH_values = [0.00025, 0.001, 0.00175, 0.0025, 0.00325, 0.004, 0.00475, 0.0055, 0.00625, 0.007, 0.00775, 0.0085, 0.00925, 0.01,
 #                         0.31075, 0.3115, 0.31225, 0.313, 0.31375, 0.3145, 0.31525, 0.316, 0.31675, 0.3175, 0.31825, 0.319, 0.31975, 
 #                         0.3205, 0.32125, 0.322, 0.32275, 0.3235, 0.32425, 0.325, 0.32575, 0.3265, 0.32725, 0.328, 0.32875, 0.3295, 
@@ -68,7 +69,7 @@ FLEX_STRENGTH_values = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06, 0.07, 0.08, 0.09]
 #                         0.00008, 0.00008, 0.00008, 0.00008, 0.00008, 0.00006, 0.00006, 0.00006, 0.00006, 0.00006, 
 #                         0.00004, 0.00004, 0.00004, 0.00004,0.00004, 0.00002, 0.00002, 0.00002, 0.00002, 0.00002,
 #                         0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.00001,  0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001]
-# S_values = [1.0]
+S_values = [1.0]
 
 def encode_s(x):
     return f"{x:.5f}".replace('.', 'p')
@@ -76,10 +77,10 @@ def encode_s(x):
 def encode_f(x):
     return f"{x:5f}".replace('.', 'p')
 
-DIR_base = "N4096_BA/BA"
+DIR_base = "f_phase_BA/BA"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 24  # run 30 simulations at the same time
+MAX_PARALLEL = 58  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
@@ -99,7 +100,7 @@ for i, (S, FLEX_STRENGTH) in enumerate(combos, start=1):
     env.update({
         "S": S,
         "FLEX_STRENGTH": FLEX_STRENGTH,
-        "DIR": f"{DIR_base}/f{f_token}"
+        "DIR": f"{DIR_base}/s{s_token}"
     })
 
     out_file = Path("logs") / f"run_{i:03d}_SQUARE_s{s_token}_flex{f_token}.out"
