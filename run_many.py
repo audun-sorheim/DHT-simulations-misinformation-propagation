@@ -80,7 +80,7 @@ def encode_f(x):
 DIR_base = "critical_BA/BA"
 
 # === PARALLELISM SETTINGS ===
-MAX_PARALLEL = 14  # run 30 simulations at the same time
+MAX_PARALLEL = 17  # run 30 simulations at the same time
 
 # === BUILD ALL PARAMETER COMBINATIONS ===
 combos = list(itertools.product(S_values, FLEX_STRENGTH_values))
