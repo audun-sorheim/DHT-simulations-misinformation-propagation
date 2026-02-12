@@ -44,6 +44,72 @@ def get_likelihoods(N, M, true_hypothesis):
 
     return likelihoods
 
+@numba.jit(nopython=True)
+def get_flexibilities(N, flex_strength=0.8, flex_interval=None):
+    """Generates the flexibilities for the agents in the network.
+
+    Args:
+        N (int): Number of agents in the network
+        flex_strength (float): The strength of the flexibilities
+        flex_interval (list): The interval for the flexibilities
+
+    Returns:
+        likelihoods (nd-array(floats) shape=(N,M)): The likelhood functions for all agents and hypotheses
+    """
+    if flex_interval is not None:
+        flexibilities = np.random.uniform(low=flex_interval[0], high=flex_interval[1], size=N).astype(np.float64)
+    else:
+        flexibilities = np.ones(N, dtype=np.float64) * flex_strength
+    return flexibilities
+
+@numba.jit(nopython=True)
+def get_likelihoods_gaussian(N, M, true_hypothesis, std_draw=0.5, std_likelihood=0.5):
+    """
+    DHT-style Gaussian likelihoods:
+      - Each hypothesis k has a distinct mean (same for all agents)
+      - All have the same standard deviation
+      - Each agent i draws a signal X_i from the *true hypothesis*
+      - Agents compute likelihoods under *all* hypotheses
+
+    Args:
+        N (int): number of agents
+        M (int): number of hypotheses
+        true_hypothesis (int): index of the true hypothesis
+        std_draw (float): standard deviation for drawing signals
+        std_likelihood (float): standard deviation for likelihood computation
+
+    Returns:
+        likelihoods (N, M): per-agent likelihoods
+    """
+    means = np.linspace(-1.0, 1.0, M)
+    likelihoods = np.zeros((N, M))
+    # print(means, means[true_hypothesis])
+    for i in range(N):
+        mu_true = means[true_hypothesis]
+        X_i = np.random.normal(mu_true, std_draw)
+        for k in range(M):
+            likelihoods[i, k] = gaussian_pdf(X_i, means[k], std_likelihood)
+    # print(likelihoods[0])
+    return likelihoods
+
+@numba.jit(nopython=True)
+def confirmation_bias(private_belief, neighbor_beliefs, s=0.6):
+    """Calculates weights based on confirmation bias represented as a Gaussian function with peak at 1.
+
+    Args:
+        private_belief (nd-array, shape=(4,)): The private beliefs of a given agent i.
+        neighbor_beliefs (nd-array, shape=(num_neighbors, 4)): The public beliefs of agent i's neighbors.
+        s (float, default=0.6): The adjusting parameter s>0, large s low confirmation bias effect, low s large confirmation bias effect.
+
+    Returns:
+        Weights: The unnormalized weights with which agent i will listen to its neighbors.
+    """
+    diff = np.abs(private_belief - neighbor_beliefs)
+    norms = np.sqrt(np.sum(diff*diff, axis=1))
+    x = 1.0 - norms
+    exponent = -(x - 1)**2/s**2
+    return np.exp(exponent)
+
 #### THE FUNC>TIONS BELOW ARE NOT USED
 
 @numba.jit(nopython=True)
