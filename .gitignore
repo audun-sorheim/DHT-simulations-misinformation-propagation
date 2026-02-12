@@ -3,7 +3,6 @@ plots/
 *.npz
 *.csv
 *.zip
-disused/
 *.log
 *.out
 *.err
